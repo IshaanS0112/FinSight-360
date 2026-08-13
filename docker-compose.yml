@@ -1,0 +1,47 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: finsight
+      POSTGRES_PASSWORD: finsight
+      POSTGRES_DB: finsight360
+    ports:
+      - "5432:5432"
+    volumes:
+      - finsight_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      # The backend creates its schema on startup, so it must not start until
+      # Postgres is actually accepting connections - not merely "container up".
+      test: ["CMD-SHELL", "pg_isready -U finsight -d finsight360"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+    environment:
+      DATABASE_URL: postgresql+psycopg2://finsight:finsight@db:5432/finsight360
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      CORS_ORIGINS: http://localhost:5173,http://localhost:3000
+      # Your own sourced reference bands, if you have them. The shipped default
+      # is illustrative placeholders.
+      REFERENCE_BENCHMARKS_PATH: ${REFERENCE_BENCHMARKS_PATH:-}
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data:ro
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+volumes:
+  finsight_pgdata:
