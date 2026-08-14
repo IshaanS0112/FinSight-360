@@ -17,8 +17,8 @@ from app.services.altman_zscore import (
     select_model,
 )
 
-
 # --- Validation against companies with known outcomes ------------------------
+
 
 def test_caterpillar_known_healthy_lands_in_safe_zone(cat_items, caterpillar, settings):
     """Known-healthy public manufacturer, the exact 1968 estimation population."""
@@ -82,6 +82,7 @@ def test_vodafone_idea_partial_but_decisive(vi_items, settings):
 
 # --- Published coefficients --------------------------------------------------
 
+
 @pytest.mark.parametrize(
     "model,expected",
     [
@@ -123,6 +124,7 @@ def test_score_is_the_sum_of_its_contributions(cat_items, settings):
 
 # --- Model selection ---------------------------------------------------------
 
+
 def test_non_manufacturer_never_gets_the_1968_model(infy_items, settings):
     """The correction that matters.
 
@@ -130,7 +132,9 @@ def test_non_manufacturer_never_gets_the_1968_model(infy_items, settings):
     implementation would happily run the 1968 model on an IT services company.
     Selection is by sector class, not by which inputs happen to be present.
     """
-    model, reason = select_model(SectorClass.NON_MANUFACTURER, {**infy_items, "market_value_equity": 1})
+    model, reason = select_model(
+        SectorClass.NON_MANUFACTURER, {**infy_items, "market_value_equity": 1}
+    )
     assert model is AltmanModel.Z_DOUBLE_PRIME
     assert "Non-manufacturer" in reason
 
@@ -177,9 +181,9 @@ def test_choosing_the_wrong_variant_changes_the_verdict_materially(cat_items, se
     assert abs(correct.score - wrong.score) > 0.5
     correct_headroom = correct.score - correct.calculation_basis["cutoffs"]["safe_above"]
     wrong_headroom = wrong.score - wrong.calculation_basis["cutoffs"]["safe_above"]
-    assert wrong_headroom > correct_headroom * 2, (
-        "the misapplied model reports roughly double the safety margin"
-    )
+    assert (
+        wrong_headroom > correct_headroom * 2
+    ), "the misapplied model reports roughly double the safety margin"
     assert "explicitly overridden" in wrong.calculation_basis["model_selection"]
 
 
@@ -218,6 +222,7 @@ def test_misapplied_1968_model_can_flip_a_verdict(settings):
 
 # --- The refusal -------------------------------------------------------------
 
+
 def test_financial_sector_issuer_gets_no_score(infy_items, settings):
     """Altman excluded financial firms from every estimation sample."""
     result = compute_z_score(
@@ -242,6 +247,7 @@ def test_financial_sector_override_still_carries_the_warning(infy_items, setting
 
 
 # --- Edge cases --------------------------------------------------------------
+
 
 def test_no_total_assets_means_no_score(settings):
     result = compute_z_score(

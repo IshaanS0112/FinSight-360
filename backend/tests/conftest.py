@@ -54,9 +54,7 @@ def load_filing(stem: str) -> dict[str, Any]:
 
 
 def filing_line_items(filing: dict[str, Any]) -> dict[str, float]:
-    return merge_statements(
-        [(s["statement_type"], s["line_items"]) for s in filing["statements"]]
-    )
+    return merge_statements([(s["statement_type"], s["line_items"]) for s in filing["statements"]])
 
 
 @pytest.fixture
@@ -71,6 +69,7 @@ def reference_table() -> tuple[dict[str, dict[str, float]], str]:
 
 
 # --- The three sourced filings ------------------------------------------------
+
 
 @pytest.fixture
 def caterpillar() -> dict[str, Any]:
@@ -126,9 +125,7 @@ def load_company(client):
         assert response.status_code == 201, response.text
         company_id = response.json()["id"]
         for statement in filing["statements"]:
-            uploaded = client.post(
-                f"/companies/{company_id}/financial-statements", json=statement
-            )
+            uploaded = client.post(f"/companies/{company_id}/financial-statements", json=statement)
             assert uploaded.status_code == 201, uploaded.text
         return company_id
 

@@ -37,9 +37,16 @@ TAG_CANDIDATES: dict[str, tuple[str, ...]] = {
     "current_liabilities": ("LiabilitiesCurrent",),
     "total_liabilities": ("Liabilities",),
     "inventory": ("InventoryNet",),
-    "shareholder_equity": ("StockholdersEquity", "StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest"),
+    "shareholder_equity": (
+        "StockholdersEquity",
+        "StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest",
+    ),
     "retained_earnings": ("RetainedEarningsAccumulatedDeficit",),
-    "revenue": ("RevenueFromContractWithCustomerExcludingAssessedTax", "Revenues", "SalesRevenueNet"),
+    "revenue": (
+        "RevenueFromContractWithCustomerExcludingAssessedTax",
+        "Revenues",
+        "SalesRevenueNet",
+    ),
     "cogs": ("CostOfGoodsAndServicesSold", "CostOfRevenue"),
     "ebit": ("OperatingIncomeLoss",),
     "net_income": ("NetIncomeLoss",),
@@ -56,9 +63,11 @@ def fetch_concept(cik: int, tag: str, user_agent: str) -> dict | None:
     except urllib.error.HTTPError as exc:
         if exc.code == 404:
             return None  # filer does not use this tag
-        raise SystemExit(f"GET {url} -> HTTP {exc.code}: {exc.read().decode(errors='replace')}")
+        raise SystemExit(
+            f"GET {url} -> HTTP {exc.code}: {exc.read().decode(errors='replace')}"
+        ) from exc
     except urllib.error.URLError as exc:
-        raise SystemExit(f"Cannot reach {url}: {exc.reason}")
+        raise SystemExit(f"Cannot reach {url}: {exc.reason}") from exc
 
 
 def pick_fy(payload: dict, fiscal_year: int) -> tuple[float, str] | None:
@@ -84,7 +93,9 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--cik", type=int, required=True, help="e.g. 18230 for Caterpillar")
     parser.add_argument("--fy", type=int, required=True, help="fiscal year as the filer labels it")
-    parser.add_argument("--scale", type=float, default=1e6, help="divide by this (default: report in millions)")
+    parser.add_argument(
+        "--scale", type=float, default=1e6, help="divide by this (default: report in millions)"
+    )
     args = parser.parse_args()
 
     user_agent = os.environ.get("SEC_USER_AGENT", "").strip()

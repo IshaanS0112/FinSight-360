@@ -125,7 +125,9 @@ def generate_insights_endpoint(company: CurrentCompany, db: DbSession, settings:
     """
     ratios = pipeline.latest_ratio_result(company)
     if ratios is None:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Run /compute-ratios first.")
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail="Run /compute-ratios first."
+        )
     if not company.bankruptcy_risks:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT, detail="Run /compute-bankruptcy-risk first."

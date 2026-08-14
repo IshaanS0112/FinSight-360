@@ -34,11 +34,11 @@ class Settings(BaseSettings):
     # --- Altman Z (1968): public manufacturers ------------------------------
     # Edward I. Altman, "Financial Ratios, Discriminant Analysis and the
     # Prediction of Corporate Bankruptcy", Journal of Finance 23(4), 1968.
-    z1968_c1: float = 1.2    # working capital / total assets
-    z1968_c2: float = 1.4    # retained earnings / total assets
-    z1968_c3: float = 3.3    # EBIT / total assets
-    z1968_c4: float = 0.6    # market value of equity / total liabilities
-    z1968_c5: float = 1.0    # sales / total assets
+    z1968_c1: float = 1.2  # working capital / total assets
+    z1968_c2: float = 1.4  # retained earnings / total assets
+    z1968_c3: float = 3.3  # EBIT / total assets
+    z1968_c4: float = 0.6  # market value of equity / total liabilities
+    z1968_c5: float = 1.0  # sales / total assets
     z1968_safe_above: float = 2.99
     z1968_distress_below: float = 1.81
 
@@ -123,23 +123,37 @@ class Settings(BaseSettings):
     def altman_coefficients(self) -> dict[str, dict[str, float]]:
         return {
             "Z_1968": {
-                "x1": self.z1968_c1, "x2": self.z1968_c2, "x3": self.z1968_c3,
-                "x4": self.z1968_c4, "x5": self.z1968_c5,
+                "x1": self.z1968_c1,
+                "x2": self.z1968_c2,
+                "x3": self.z1968_c3,
+                "x4": self.z1968_c4,
+                "x5": self.z1968_c5,
             },
             "Z_PRIME": {
-                "x1": self.zprime_c1, "x2": self.zprime_c2, "x3": self.zprime_c3,
-                "x4": self.zprime_c4, "x5": self.zprime_c5,
+                "x1": self.zprime_c1,
+                "x2": self.zprime_c2,
+                "x3": self.zprime_c3,
+                "x4": self.zprime_c4,
+                "x5": self.zprime_c5,
             },
             "Z_DOUBLE_PRIME": {
-                "x1": self.zdprime_c1, "x2": self.zdprime_c2, "x3": self.zdprime_c3,
+                "x1": self.zdprime_c1,
+                "x2": self.zdprime_c2,
+                "x3": self.zdprime_c3,
                 "x4": self.zdprime_c4,
             },
         }
 
     def altman_cutoffs(self) -> dict[str, dict[str, float]]:
         return {
-            "Z_1968": {"safe_above": self.z1968_safe_above, "distress_below": self.z1968_distress_below},
-            "Z_PRIME": {"safe_above": self.zprime_safe_above, "distress_below": self.zprime_distress_below},
+            "Z_1968": {
+                "safe_above": self.z1968_safe_above,
+                "distress_below": self.z1968_distress_below,
+            },
+            "Z_PRIME": {
+                "safe_above": self.zprime_safe_above,
+                "distress_below": self.zprime_distress_below,
+            },
             "Z_DOUBLE_PRIME": {
                 "safe_above": self.zdprime_safe_above,
                 "distress_below": self.zdprime_distress_below,

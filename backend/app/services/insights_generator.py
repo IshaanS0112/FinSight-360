@@ -120,9 +120,7 @@ def build_structured_context(
             "borderline": risk.borderline,
             "cutoffs": risk.calculation_basis.get("cutoffs"),
             "components": risk.components,
-            "component_definitions": {
-                k: COMPONENT_DEFINITIONS[k] for k in risk.components
-            },
+            "component_definitions": {k: COMPONENT_DEFINITIONS[k] for k in risk.components},
             "component_meanings": {k: COMPONENT_MEANINGS[k] for k in risk.components},
             "omitted_components": risk.omitted_components,
             "confidence": risk.confidence.value,
@@ -183,9 +181,7 @@ def _fallback_narrative(context: dict[str, Any], reason: str) -> dict[str, Any]:
     ratios = context["ratios"]
 
     if risk["zone"] == Zone.NOT_APPLICABLE.value:
-        risk_sentence = (
-            f"No Altman score was produced. {risk.get('model_selection') or ''}".strip()
-        )
+        risk_sentence = f"No Altman score was produced. {risk.get('model_selection') or ''}".strip()
     else:
         borderline = (
             " The score sits within the borderline margin of a zone cutoff, so the "
@@ -222,20 +218,24 @@ def _fallback_narrative(context: dict[str, Any], reason: str) -> dict[str, Any]:
                 f"({info['delta_pct_of_benchmark']:+.2f}% relative)."
             ),
             "implication": (
-                "Ahead of benchmark." if info["delta_pct_of_benchmark"] >= 0 else "Behind benchmark."
+                "Ahead of benchmark."
+                if info["delta_pct_of_benchmark"] >= 0
+                else "Behind benchmark."
             ),
         }
         for key, info in list(deltas.items())[:5]
     ]
     for component, values in list(risk.get("components", {}).items())[:2]:
-        key_findings.append({
-            "metric": component,
-            "observation": (
-                f"{component} = {values['ratio']}, contributing {values['contribution']} "
-                f"to the {risk['model']} score."
-            ),
-            "implication": COMPONENT_MEANINGS.get(component, ""),
-        })
+        key_findings.append(
+            {
+                "metric": component,
+                "observation": (
+                    f"{component} = {values['ratio']}, contributing {values['contribution']} "
+                    f"to the {risk['model']} score."
+                ),
+                "implication": COMPONENT_MEANINGS.get(component, ""),
+            }
+        )
 
     omitted_ratios = [o["ratio"] for o in ratios.get("omitted", [])]
     omitted_components = [o["component"] for o in risk.get("omitted_components", [])]
@@ -299,7 +299,12 @@ def _validate_narrative(raw: str, context: dict[str, Any]) -> dict[str, Any]:
     parsed = json.loads(text)
     if not isinstance(parsed, dict):
         raise ValueError("Model returned JSON that is not an object")
-    for key in ("executive_summary", "bankruptcy_risk_assessment", "key_findings", "recommendation"):
+    for key in (
+        "executive_summary",
+        "bankruptcy_risk_assessment",
+        "key_findings",
+        "recommendation",
+    ):
         if key not in parsed:
             raise ValueError(f"Model response missing required key: {key}")
 
@@ -312,11 +317,13 @@ def _validate_narrative(raw: str, context: dict[str, Any]) -> dict[str, Any]:
             continue
         metric = str(item.get("metric", "")).strip()
         if metric in allowed:
-            verified.append({
-                "metric": metric,
-                "observation": str(item.get("observation", "")),
-                "implication": str(item.get("implication", "")),
-            })
+            verified.append(
+                {
+                    "metric": metric,
+                    "observation": str(item.get("observation", "")),
+                    "implication": str(item.get("implication", "")),
+                }
+            )
         else:
             dropped.append(item)
 
@@ -346,9 +353,7 @@ def generate_narrative(context: dict[str, Any], settings: Settings) -> dict[str,
     try:
         from anthropic import Anthropic
 
-        client = Anthropic(
-            api_key=settings.anthropic_api_key, timeout=settings.llm_timeout_seconds
-        )
+        client = Anthropic(api_key=settings.anthropic_api_key, timeout=settings.llm_timeout_seconds)
         response = client.messages.create(
             model=settings.anthropic_model,
             max_tokens=settings.llm_max_tokens,

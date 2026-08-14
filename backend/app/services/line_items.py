@@ -39,9 +39,18 @@ class LineItemSpec:
 
 BALANCE_SHEET_ITEMS: tuple[LineItemSpec, ...] = (
     LineItemSpec("total_assets", "Total assets", StatementType.BALANCE_SHEET, non_negative=True),
-    LineItemSpec("current_assets", "Total current assets", StatementType.BALANCE_SHEET, non_negative=True),
-    LineItemSpec("current_liabilities", "Total current liabilities", StatementType.BALANCE_SHEET, non_negative=True),
-    LineItemSpec("total_liabilities", "Total liabilities", StatementType.BALANCE_SHEET, non_negative=True),
+    LineItemSpec(
+        "current_assets", "Total current assets", StatementType.BALANCE_SHEET, non_negative=True
+    ),
+    LineItemSpec(
+        "current_liabilities",
+        "Total current liabilities",
+        StatementType.BALANCE_SHEET,
+        non_negative=True,
+    ),
+    LineItemSpec(
+        "total_liabilities", "Total liabilities", StatementType.BALANCE_SHEET, non_negative=True
+    ),
     LineItemSpec("inventory", "Inventory", StatementType.BALANCE_SHEET, non_negative=True),
     LineItemSpec(
         "shareholder_equity",
@@ -95,9 +104,7 @@ CASH_FLOW_ITEMS: tuple[LineItemSpec, ...] = (
     LineItemSpec("capital_expenditure", "Capital expenditure", StatementType.CASH_FLOW),
 )
 
-ALL_ITEMS: tuple[LineItemSpec, ...] = (
-    BALANCE_SHEET_ITEMS + INCOME_STATEMENT_ITEMS + CASH_FLOW_ITEMS
-)
+ALL_ITEMS: tuple[LineItemSpec, ...] = BALANCE_SHEET_ITEMS + INCOME_STATEMENT_ITEMS + CASH_FLOW_ITEMS
 ITEM_BY_KEY: dict[str, LineItemSpec] = {spec.key: spec for spec in ALL_ITEMS}
 
 ITEMS_BY_STATEMENT: dict[StatementType, tuple[LineItemSpec, ...]] = {
@@ -114,7 +121,7 @@ def is_number(value: Any) -> bool:
     ``"total_assets": true`` would otherwise sail through and produce a total
     assets figure of 1.
     """
-    return isinstance(value, (int, float)) and not isinstance(value, bool)
+    return isinstance(value, int | float) and not isinstance(value, bool)
 
 
 def get(items: dict[str, Any], key: str) -> float | None:
@@ -146,8 +153,8 @@ def derive_gross_profit(items: dict[str, float]) -> float | None:
     """Gross profit, taken as reported or derived from revenue - COGS.
 
     Derivation is safe here because the identity is definitional, and it is
-    worth doing because gross margin is one of the few ratios an interviewer
-    will ask about by name.
+    worth doing because gross margin is one of the headline profitability ratios
+    and filings frequently omit it while reporting both of its inputs.
     """
     reported = get(items, "gross_profit")
     if reported is not None:

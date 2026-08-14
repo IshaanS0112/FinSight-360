@@ -53,7 +53,7 @@ export default function ZScoreGauge({ risk }: { risk: BankruptcyRisk }) {
         </div>
         <div className="text-right">
           <div className="stat text-3xl font-semibold text-slate-100">
-            {risk.altman_z_score ?? "—"}
+            {risk.altman_z_score ?? "-"}
           </div>
           <span className={`chip mt-1 ${zoneStyle}`}>{risk.zone.replace("_", " ")}</span>
         </div>
@@ -137,7 +137,7 @@ export default function ZScoreGauge({ risk }: { risk: BankruptcyRisk }) {
             {risk.omitted_components.map((entry) => (
               <li key={entry.component}>
                 <span className="font-mono uppercase text-slate-400">{entry.component}</span>{" "}
-                — {entry.reason}
+               , {entry.reason}
               </li>
             ))}
           </ul>

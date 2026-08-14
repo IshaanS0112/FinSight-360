@@ -118,7 +118,7 @@ export default function RatioDashboard({
             {ratios.omitted_ratios.map((entry) => (
               <li key={entry.ratio} className="leading-relaxed">
                 <span className="text-slate-400">{RATIO_LABEL[entry.ratio] ?? entry.ratio}</span>{" "}
-                — {entry.reason}
+               , {entry.reason}
               </li>
             ))}
           </ul>

@@ -20,7 +20,7 @@ class FinancialStatement(Base):
     )
     statement_type: Mapped[str] = mapped_column(String(30), nullable=False)
 
-    # Free-shaped by design: filings disclose different line items, and the
+    # Free-shaped: filings disclose different line items, and the
     # ratio engine reads named keys and skips what a given company did not
     # report rather than imputing a value. The closed set of keys the engine
     # understands is declared in services/line_items.py.

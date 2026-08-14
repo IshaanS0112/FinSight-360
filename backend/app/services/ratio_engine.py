@@ -4,8 +4,7 @@ Ten ratios across the four standard categories. No model, no network, no
 randomness - the same line items always produce the same numbers.
 
 Three things in here are decisions rather than transcription, and each is
-documented at its call site because each is the kind of thing an interviewer
-pushes on:
+documented at its call site because each changes the reported number:
 
 1. **Definitions vary and the choice is visible.** Quick ratio has at least two
    accepted forms. Asset and inventory turnover can use ending or average
@@ -107,8 +106,8 @@ def compute_ratios(items: dict[str, float]) -> RatioResult:
     else:
         result.liquidity["current_ratio"] = _round(current_assets / current_liabilities)
         if inventory is None:
-            # Deliberately not defaulting inventory to 0: that would make the
-            # quick ratio equal the current ratio and hide the omission.
+            # Not defaulting inventory to 0: that would make the quick ratio
+            # equal the current ratio and hide the omission.
             omit("quick_ratio", "inventory not reported; not assumed to be zero")
         else:
             result.liquidity["quick_ratio"] = _round(
@@ -205,8 +204,8 @@ def compute_ratios(items: dict[str, float]) -> RatioResult:
         omit("inventory_turnover", "inventory is zero; turnover is undefined")
     else:
         # Ending inventory, not average inventory. The spec asks for average, but
-        # this is a single-fiscal-year system by design (V1 scope) and there is
-        # no prior-year balance to average with. Stating that is more useful than
+        # this is a single-fiscal-year system (V1 scope) and there is no
+        # prior-year balance to average with. Stating that is more useful than
         # calling an ending-balance figure an average.
         result.efficiency["inventory_turnover"] = _round(cogs / inventory)
 

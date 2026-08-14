@@ -36,9 +36,7 @@ logger = logging.getLogger(__name__)
 
 def merged_line_items(company: Company) -> dict[str, float]:
     """Every reported line item for this company, latest upload winning."""
-    return li.merge_statements(
-        [(s.statement_type, s.line_items) for s in company.statements]
-    )
+    return li.merge_statements([(s.statement_type, s.line_items) for s in company.statements])
 
 
 def run_ratios(company: Company, db: Session) -> tuple[RatioAnalysis, RatioResult]:
@@ -115,12 +113,14 @@ def peer_ratio_sets(company: Company, db: Session) -> list[dict[str, float]]:
         if not peer.ratio_analyses:
             continue
         latest = peer.ratio_analyses[-1]
-        sets.append({
-            **latest.liquidity_ratios,
-            **latest.profitability_ratios,
-            **latest.leverage_ratios,
-            **latest.efficiency_ratios,
-        })
+        sets.append(
+            {
+                **latest.liquidity_ratios,
+                **latest.profitability_ratios,
+                **latest.leverage_ratios,
+                **latest.efficiency_ratios,
+            }
+        )
     return sets
 
 

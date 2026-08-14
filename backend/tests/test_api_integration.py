@@ -22,6 +22,7 @@ def test_methodology_admits_the_health_score_is_not_an_established_model(client)
 
 # --- The full demo flow ------------------------------------------------------
 
+
 def test_full_analysis_flow_for_caterpillar(client, load_company, caterpillar):
     company_id = load_company(caterpillar)
 
@@ -82,6 +83,7 @@ def test_distressed_company_reports_partial_confidence_over_http(
 
 # --- Preconditions and ordering ----------------------------------------------
 
+
 def test_analysis_before_any_statement_is_a_conflict_not_a_crash(client, caterpillar):
     company_id = client.post("/companies", json=caterpillar["company"]).json()["id"]
     response = client.post(f"/companies/{company_id}/compute-ratios")
@@ -89,9 +91,7 @@ def test_analysis_before_any_statement_is_a_conflict_not_a_crash(client, caterpi
     assert "No financial statements" in response.json()["detail"]
 
 
-def test_health_score_before_ratios_says_which_stage_is_missing(
-    client, load_company, caterpillar
-):
+def test_health_score_before_ratios_says_which_stage_is_missing(client, load_company, caterpillar):
     company_id = load_company(caterpillar)
     response = client.post(f"/companies/{company_id}/compute-health-score")
     assert response.status_code == 409
@@ -117,6 +117,7 @@ def test_unknown_company_is_404(client):
 
 
 # --- Input validation --------------------------------------------------------
+
 
 def test_unknown_line_item_key_is_rejected(client, load_company, caterpillar):
     company_id = load_company(caterpillar)
@@ -156,8 +157,10 @@ def test_negative_retained_earnings_is_accepted(client, caterpillar):
         json={
             "statement_type": "BALANCE_SHEET",
             "line_items": {
-                "total_assets": 1000, "total_liabilities": 1400,
-                "shareholder_equity": -400, "retained_earnings": -900,
+                "total_assets": 1000,
+                "total_liabilities": 1400,
+                "shareholder_equity": -400,
+                "retained_earnings": -900,
             },
         },
     )
@@ -177,7 +180,8 @@ def test_unbalanced_balance_sheet_is_rejected_with_the_residual(client, caterpil
         json={
             "statement_type": "BALANCE_SHEET",
             "line_items": {
-                "total_assets": 87764, "total_liabilities": 68270,
+                "total_assets": 87764,
+                "total_liabilities": 68270,
                 "shareholder_equity": 1949,  # a dropped digit: should be 19,494
             },
         },
@@ -195,7 +199,8 @@ def test_rounding_within_tolerance_still_balances(client, caterpillar):
         json={
             "statement_type": "BALANCE_SHEET",
             "line_items": {
-                "total_assets": 87764, "total_liabilities": 68270,
+                "total_assets": 87764,
+                "total_liabilities": 68270,
                 "shareholder_equity": 19497,  # 3m out on 87,764m: well inside 0.5%
             },
         },
@@ -218,6 +223,7 @@ def test_unknown_currency_is_rejected(client, caterpillar):
 
 # --- Model overrides over HTTP ------------------------------------------------
 
+
 def test_model_override_is_honoured_and_recorded(client, load_company, caterpillar):
     company_id = load_company(caterpillar)
     response = client.post(
@@ -230,9 +236,7 @@ def test_model_override_is_honoured_and_recorded(client, load_company, caterpill
     assert "explicitly overridden" in body["calculation_basis"]["model_selection"]
 
 
-def test_emerging_market_constant_on_the_wrong_model_is_a_422(
-    client, load_company, caterpillar
-):
+def test_emerging_market_constant_on_the_wrong_model_is_a_422(client, load_company, caterpillar):
     company_id = load_company(caterpillar)
     response = client.post(
         f"/companies/{company_id}/compute-bankruptcy-risk",
@@ -261,6 +265,7 @@ def test_financial_sector_company_gets_no_score_over_http(client, caterpillar):
 
 
 # --- Peer benchmarks ---------------------------------------------------------
+
 
 def test_three_peers_in_one_industry_switch_the_benchmark_basis(client, caterpillar):
     """Loads four same-industry companies so the peer median has enough members."""

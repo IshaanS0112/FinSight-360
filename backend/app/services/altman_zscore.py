@@ -23,15 +23,15 @@ Model                   Population                                  Cutoffs (saf
 ``Z_DOUBLE_PRIME`` (Z'')non-manufacturers & emerging markets, no X5 2.60 / 1.10
 ======================  ==========================================  ==================
 
-Three consequences worth knowing before reading the code:
+Three consequences follow:
 
 **Financial-sector issuers get no score.** Altman excluded banks, insurers, and
 other financial firms from the estimation samples, and for a good reason: for a
 bank, leverage is the business model, so "total liabilities / total assets near
 1" is normal rather than terminal. This module returns ``Zone.NOT_APPLICABLE``
-with an explanation rather than a number. Producing a Z-score for a bank would be
-the single easiest way for an interviewer to establish that a candidate had
-implemented a formula without understanding its domain.
+with an explanation rather than a number. A Z-score for a bank is a formula
+applied outside the population it was estimated on; the output would look
+plausible and mean nothing.
 
 **Z (1968) needs market value of equity at the fiscal year end.** Not today's
 market cap. If it is missing, this module reports Z' rather than substituting
@@ -182,7 +182,11 @@ def _component_ratios(
 
     for component in MODEL_COMPONENTS[model]:
         if component == "x1":
-            add("x1", li.working_capital(items), "current_assets or current_liabilities not reported")
+            add(
+                "x1",
+                li.working_capital(items),
+                "current_assets or current_liabilities not reported",
+            )
         elif component == "x2":
             add("x2", li.get(items, "retained_earnings"), "retained_earnings not reported")
         elif component == "x3":
@@ -199,16 +203,20 @@ def _component_ratios(
                 else li.get(items, "shareholder_equity")
             )
             if equity_value is None:
-                omitted.append({
-                    "component": "x4",
-                    "reason": (
-                        "market_value_equity not reported"
-                        if model is AltmanModel.Z_1968
-                        else "shareholder_equity not reported"
-                    ),
-                })
+                omitted.append(
+                    {
+                        "component": "x4",
+                        "reason": (
+                            "market_value_equity not reported"
+                            if model is AltmanModel.Z_1968
+                            else "shareholder_equity not reported"
+                        ),
+                    }
+                )
             elif not total_liabilities:
-                omitted.append({"component": "x4", "reason": "total_liabilities not reported or zero"})
+                omitted.append(
+                    {"component": "x4", "reason": "total_liabilities not reported or zero"}
+                )
             else:
                 # Negative book equity produces a negative X4, which is exactly
                 # the intended signal: liabilities exceed assets. Not clamped.
@@ -217,11 +225,11 @@ def _component_ratios(
     return ratios, omitted
 
 
-def _classify(score: float, safe_above: float, distress_below: float, margin: float) -> tuple[Zone, bool]:
+def _classify(
+    score: float, safe_above: float, distress_below: float, margin: float
+) -> tuple[Zone, bool]:
     zone = (
-        Zone.SAFE if score > safe_above
-        else Zone.DISTRESS if score < distress_below
-        else Zone.GREY
+        Zone.SAFE if score > safe_above else Zone.DISTRESS if score < distress_below else Zone.GREY
     )
     borderline = abs(score - safe_above) <= margin or abs(score - distress_below) <= margin
     return zone, borderline
@@ -249,7 +257,10 @@ def compute_z_score(
         )
 
     if model_override is not None:
-        model, selection_reason = model_override, f"Model explicitly overridden to {model_override.value}."
+        model, selection_reason = (
+            model_override,
+            f"Model explicitly overridden to {model_override.value}.",
+        )
         if sector_class is SectorClass.FINANCIAL:
             selection_reason += (
                 " Requested for a financial-sector issuer against the model's stated "
@@ -303,9 +314,7 @@ def compute_z_score(
     zone, borderline = _classify(score, safe_above, distress_below, settings.zone_borderline_margin)
 
     expected = len(MODEL_COMPONENTS[model])
-    confidence = (
-        ResultConfidence.COMPLETE if len(ratios) == expected else ResultConfidence.PARTIAL
-    )
+    confidence = ResultConfidence.COMPLETE if len(ratios) == expected else ResultConfidence.PARTIAL
 
     return ZScoreResult(
         model=model,
@@ -319,16 +328,11 @@ def compute_z_score(
             "citation": MODEL_CITATIONS[model],
             "model_selection": selection_reason,
             "sector_class": sector_class.value,
-            "formula": " + ".join(
-                f"{coefficients[c]}*{c}" for c in MODEL_COMPONENTS[model]
-            ) + (f" + {emerging_constant} (emerging-market constant)" if emerging_constant else ""),
-            "component_definitions": {
-                c: COMPONENT_DEFINITIONS[c] for c in MODEL_COMPONENTS[model]
-            },
+            "formula": " + ".join(f"{coefficients[c]}*{c}" for c in MODEL_COMPONENTS[model])
+            + (f" + {emerging_constant} (emerging-market constant)" if emerging_constant else ""),
+            "component_definitions": {c: COMPONENT_DEFINITIONS[c] for c in MODEL_COMPONENTS[model]},
             "component_meanings": {c: COMPONENT_MEANINGS[c] for c in MODEL_COMPONENTS[model]},
-            "x4_equity_basis": (
-                "MARKET_VALUE" if model is AltmanModel.Z_1968 else "BOOK_VALUE"
-            ),
+            "x4_equity_basis": ("MARKET_VALUE" if model is AltmanModel.Z_1968 else "BOOK_VALUE"),
             "cutoffs": {"safe_above": safe_above, "distress_below": distress_below},
             "borderline_margin": settings.zone_borderline_margin,
             "emerging_market_constant_applied": emerging_constant or None,

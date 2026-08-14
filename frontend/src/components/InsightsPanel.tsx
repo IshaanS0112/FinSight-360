@@ -3,9 +3,9 @@ import type { InsightReport } from "../api/types";
 /**
  * The narrative, plus the structured context it was allowed to use.
  *
- * The context is one click away on purpose. The claim the project makes is that
- * every figure in the prose existed before the model was called, and the only way
- * to make that checkable rather than asserted is to put both on the same screen.
+ * The context sits one click away because the claim the project makes is that
+ * every figure in the prose existed before the model was called. Putting both on
+ * the same screen is what makes that checkable rather than asserted.
  */
 export default function InsightsPanel({ report }: { report: InsightReport }) {
   const narrative = report.ai_narrative;
@@ -29,7 +29,7 @@ export default function InsightsPanel({ report }: { report: InsightReport }) {
       {isFallback && narrative.fallback_reason && (
         <p className="mb-4 rounded border border-edge bg-ink p-2 text-xs text-muted">
           No LLM narration: {narrative.fallback_reason}. Every figure below is identical
-          either way — only the prose differs.
+          either way, only the prose differs.
         </p>
       )}
 
@@ -62,7 +62,7 @@ export default function InsightsPanel({ report }: { report: InsightReport }) {
               {narrative.key_findings.map((finding, index) => (
                 <li key={`${finding.metric}-${index}`} className="text-xs">
                   <span className="font-mono text-slate-200">{finding.metric}</span>
-                  <span className="text-muted"> — {finding.observation}</span>
+                  <span className="text-muted">, {finding.observation}</span>
                   {finding.implication && (
                     <div className="mt-0.5 text-muted">{finding.implication}</div>
                   )}

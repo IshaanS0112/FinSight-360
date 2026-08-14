@@ -4,59 +4,96 @@ on:
   push:
     branches: [main]
   pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   backend:
-    name: Backend tests
+    name: Backend
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
           cache: pip
-      - name: Install
-        working-directory: backend
+          cache-dependency-path: backend/requirements-dev.txt
+
+      - name: Install dependencies
         run: pip install -r requirements-dev.txt
+
+      - name: Lint
+        run: |
+          pip install ruff==0.8.4
+          ruff check app tests scripts
+          ruff format --check app tests scripts
+
       - name: Test
-        working-directory: backend
-        # No services block: the models declare JSONB and UUID as dialect
-        # variants, so the API tests run the real app against SQLite. CI needs
-        # no database container.
-        run: python -m pytest -q
+        # No services block. The models declare JSONB and UUID as dialect
+        # variants, so the API tests run the real app against SQLite.
+        run: pytest -q
 
   frontend:
-    name: Frontend typecheck and build
+    name: Frontend
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
-          node-version: "22"
-      - name: Install
-        working-directory: frontend
-        run: npm install
-      - name: Typecheck
-        working-directory: frontend
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type-check
         run: npm run typecheck
+
       - name: Build
-        working-directory: frontend
         run: npm run build
 
-  sample-data:
-    name: Sample filings are valid and reproduce the documented verdicts
+  validation:
+    name: Sample filings reproduce documented verdicts
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
           cache: pip
-      - name: Install
-        working-directory: backend
+          cache-dependency-path: backend/requirements-dev.txt
+
+      - name: Install dependencies
         run: pip install -r requirements-dev.txt
+
       - name: Validate every sample filing against its expected zone
-        working-directory: backend
-        # The validation tests read the JSON files directly, so a filing edited
-        # to a value that no longer produces the documented verdict fails here.
-        run: python -m pytest tests/test_altman_zscore.py -q
+        # These tests read data/sample_filings/*.json directly, so a filing
+        # edited to a value that no longer produces the documented verdict
+        # fails here.
+        run: pytest tests/test_altman_zscore.py -q
+
+  docker:
+    name: Docker images build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build backend image
+        run: docker build -t finsight-backend ./backend
+      - name: Build frontend image
+        run: docker build -t finsight-frontend ./frontend

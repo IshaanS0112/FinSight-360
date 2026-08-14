@@ -23,9 +23,12 @@ def build(items, settings, reference_table, industry, peers=None):
 
 # --- The normalisation -------------------------------------------------------
 
+
 def test_exactly_at_benchmark_scores_fifty(settings):
     score = score_ratio_against_benchmark(
-        value=1.5, benchmark=1.5, higher_is_better=True,
+        value=1.5,
+        benchmark=1.5,
+        higher_is_better=True,
         full_credit_ratio=settings.health_full_credit_ratio,
     )
     assert score == 50.0
@@ -33,7 +36,9 @@ def test_exactly_at_benchmark_scores_fifty(settings):
 
 def test_twice_the_benchmark_scores_one_hundred(settings):
     score = score_ratio_against_benchmark(
-        value=3.0, benchmark=1.5, higher_is_better=True,
+        value=3.0,
+        benchmark=1.5,
+        higher_is_better=True,
         full_credit_ratio=settings.health_full_credit_ratio,
     )
     assert score == 100.0
@@ -71,9 +76,13 @@ def test_score_never_leaves_the_zero_hundred_range(settings):
 
 # --- The composite -----------------------------------------------------------
 
+
 def test_weights_sum_to_one_and_match_the_spec(settings):
     assert settings.health_weights == {
-        "profitability": 0.35, "liquidity": 0.25, "leverage": 0.20, "efficiency": 0.20,
+        "profitability": 0.35,
+        "liquidity": 0.25,
+        "leverage": 0.20,
+        "efficiency": 0.20,
     }
     assert sum(settings.health_weights.values()) == pytest.approx(1.0)
 
@@ -94,22 +103,20 @@ def test_healthy_company_scores_above_a_distressed_one(
     assert distressed.overall_score < 50.0, "behind benchmark on every scoreable ratio"
 
 
-def test_infosys_scores_well_against_its_own_industry_band(
-    infy_items, settings, reference_table
-):
+def test_infosys_scores_well_against_its_own_industry_band(infy_items, settings, reference_table):
     result = build(infy_items, settings, reference_table, "it services")
     assert result.confidence is ResultConfidence.COMPLETE
     assert result.overall_score > 50.0
-    assert set(result.component_scores) == {
-        "profitability", "liquidity", "leverage", "efficiency"
-    }
+    assert set(result.component_scores) == {"profitability", "liquidity", "leverage", "efficiency"}
 
 
 def test_dropped_component_renormalises_rather_than_scoring_zero(settings, reference_table):
     """A company that discloses no income statement is not thereby unhealthy."""
     items = {
-        "total_assets": 1000.0, "current_assets": 300.0,
-        "current_liabilities": 200.0, "inventory": 50.0,
+        "total_assets": 1000.0,
+        "current_assets": 300.0,
+        "current_liabilities": 200.0,
+        "inventory": 50.0,
     }
     result = build(items, settings, reference_table, "_default")
     assert result.confidence is ResultConfidence.PARTIAL
@@ -131,9 +138,8 @@ def test_no_scoreable_ratio_is_unusable_not_zero(settings, reference_table):
 
 # --- Benchmark provenance ----------------------------------------------------
 
-def test_placeholder_provenance_is_stated_in_every_result(
-    cat_items, settings, reference_table
-):
+
+def test_placeholder_provenance_is_stated_in_every_result(cat_items, settings, reference_table):
     """The reference bands are placeholders and the result says so out loud."""
     result = build(cat_items, settings, reference_table, "industrial machinery")
     provenance = result.calculation_basis["benchmark_provenance"]
@@ -141,9 +147,7 @@ def test_placeholder_provenance_is_stated_in_every_result(
     assert result.calculation_basis["benchmark_bases_used"] == ["REFERENCE_TABLE"]
 
 
-def test_enough_peers_switches_the_basis_to_the_peer_median(
-    cat_items, settings, reference_table
-):
+def test_enough_peers_switches_the_basis_to_the_peer_median(cat_items, settings, reference_table):
     peers = [
         {"current_ratio": 1.0, "roa": 4.0, "asset_turnover": 0.5, "net_margin": 5.0},
         {"current_ratio": 1.2, "roa": 5.0, "asset_turnover": 0.6, "net_margin": 6.0},
@@ -157,18 +161,14 @@ def test_enough_peers_switches_the_basis_to_the_peer_median(
     assert detail["benchmark"] == pytest.approx(1.2), "median of three peers, not the mean"
 
 
-def test_too_few_peers_falls_back_to_the_reference_table(
-    cat_items, settings, reference_table
-):
+def test_too_few_peers_falls_back_to_the_reference_table(cat_items, settings, reference_table):
     peers = [{"current_ratio": 9.0}, {"current_ratio": 9.0}]  # below benchmark_min_peers
     result = build(cat_items, settings, reference_table, "industrial machinery", peers=peers)
     detail = result.calculation_basis["component_detail"]["liquidity"]["ratios"]["current_ratio"]
     assert detail["benchmark_basis"] == "REFERENCE_TABLE"
 
 
-def test_peer_percentile_is_withheld_rather_than_faked(
-    cat_items, settings, reference_table
-):
+def test_peer_percentile_is_withheld_rather_than_faked(cat_items, settings, reference_table):
     """Three peers cannot produce an industry percentile, so none is reported."""
     result = build(cat_items, settings, reference_table, "industrial machinery")
     assert result.peer_percentile is None

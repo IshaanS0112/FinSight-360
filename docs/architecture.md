@@ -1,4 +1,4 @@
-# FinSight 360 — architecture
+# FinSight 360: architecture
 
 ```
 React + TS + Tailwind  ◄──►  FastAPI  ──►  PostgreSQL 16
@@ -24,13 +24,13 @@ service function is importable and testable without a database, which is why
 
 ## What's real vs simulated
 
-**Real — all of it, and that is the point of this project.**
+**Real, all of it.**
 
 | Layer | Status |
 |---|---|
 | Ratio arithmetic | Real. Ten standard ratios over reported line items. No estimation, no model. |
 | Altman Z (1968), Z′, Z″ | Real, published discriminant functions with the published coefficients and cutoffs. Cited in code and returned in every response. |
-| Model selection by sector | Real logic, and the part most implementations get wrong — see below. |
+| Model selection by sector | Real logic, and the part most implementations get wrong (see below). |
 | Financial-sector refusal | Real. Banks and insurers get no score, with an explanation. |
 | Balance-sheet identity check | Real. Assets = liabilities + equity within 0.5% or the upload is rejected. |
 | Sample company data | Real public filings for Caterpillar FY2024, Infosys FY2024, Vodafone Idea FY2024. Provenance and the two derived figures are documented in `data/sample_filings/README.md`. |
@@ -45,7 +45,7 @@ service function is importable and testable without a database, which is why
 **Placeholders, and labelled as such:**
 
 - **The reference benchmark bands** in `services/benchmarks.py` are illustrative
-  round numbers. They are deliberately unattributed, because inventing an
+  round numbers. They are unattributed, because inventing an
   attribution would be worse than admitting they are placeholders. Two real paths
   exist and neither needs a code change: load three or more same-industry
   companies and the engine benchmarks against the peer median, or point
@@ -73,7 +73,7 @@ Z = 1.2·X1 + 1.4·X2 + 3.3·X3 + 0.6·X4 + 1.0·X5      safe > 2.99, distress <
 That is Altman (1968), and it was estimated on a sample of **publicly traded
 manufacturing firms**. Implementing only that model and then running it on an IT
 services company or a telecom operator would produce numbers that look right and
-mean nothing — the arithmetic works, but the coefficients and cutoffs were fitted
+mean nothing. The arithmetic works, but the coefficients and cutoffs were fitted
 to a population those firms are not drawn from.
 
 Altman published the corrections himself. All three are implemented:
@@ -94,8 +94,8 @@ services company that happens to be listed.
 
 **2. Getting the variant wrong can flip the verdict.**
 `test_misapplied_1968_model_can_flip_a_verdict` constructs a non-manufacturer
-scoring **2.74 under Z″ — SAFE**, above the 2.60 cutoff, and **1.36 under the 1968
-coefficients — DISTRESS**, below the 1.81 cutoff. Same balance sheet, opposite
+scoring **2.74 under Z″: SAFE**, above the 2.60 cutoff, and **1.36 under the 1968
+coefficients, DISTRESS**, below the 1.81 cutoff. Same balance sheet, opposite
 conclusion, purely from applying coefficients fitted elsewhere against cutoffs
 calibrated for them.
 
@@ -120,7 +120,7 @@ a Merton distance-to-default instead.
 
 Two pairs, one per model variant, from real filings. Every figure below is
 reproduced by `backend/tests/test_altman_zscore.py`, which reads the JSON files in
-`data/sample_filings/` directly — so editing a filing to a value that no longer
+`data/sample_filings/` directly, so a filing edited to a value that no longer
 produces the documented verdict fails CI.
 
 | Company | FY | Sector | Model | Score | Zone | Expected |
@@ -144,7 +144,7 @@ X5 = 64,809 / 87,764 = 0.73845   × 1.0 =  0.73845
 Vodafone Idea's verdict is driven by two balance-sheet facts, not estimates:
 working capital of **−412,315**m INR (X1) and an accumulated deficit of
 **−2,339,687**m against total assets of 1,849,977m (X2). Its shareholders' equity
-is **−1,041,668**m — liabilities exceed assets outright.
+is **−1,041,668**m: liabilities exceed assets outright.
 
 ### The honest part of the validation
 
@@ -154,7 +154,7 @@ without a depreciation figure that is also unavailable. So `ebit` is absent from
 the filing, `x3` is listed in `omitted_components`, the response carries a
 `partial_score_warning`, and the score is a four-term partial sum.
 
-The verdict does not depend on the missing term — the four remaining terms land at
+The verdict does not depend on the missing term. The four remaining terms land at
 −5.96 against a distress cutoff of 1.10, and no plausible X3 closes a seven-point
 gap. But the result says it is partial rather than presenting a complete-looking
 number, because a partial sum is biased toward the cutoffs and a reader is
@@ -176,15 +176,15 @@ GET https://data.sec.gov/api/xbrl/companyconcept/CIK0000018230/us-gaap/Assets.js
 
 ## Ratio definitions disagree, and the disagreement is worth showing
 
-A ratio is not one thing. Two worked comparisons against figures published by
+Ratio definitions vary between data providers. Two worked comparisons against figures published by
 S&P Global Market Intelligence for **Vodafone Idea FY2024**:
 
-**Current ratio — agreement.** Both compute 129,098 / 541,413 = **0.24**. The
+**Current ratio: agreement.** Both compute 129,098 / 541,413 = **0.24**. The
 definition is not contested, so an exact tie is evidence that the transcription
 and the arithmetic are both right. `test_gross_margin_reproduces_the_published_figure`
 does the same job for Caterpillar's gross margin (37.97%, exact).
 
-**Quick ratio — definitional difference.**
+**Quick ratio: definitional difference.**
 
 ```
 This project (spec form):  (129,098 − 12) / 541,413        = 0.24
@@ -193,13 +193,13 @@ S&P (strict form):   (1,684 cash + 101,972 recv) / 541,413 = 0.19
 
 Vodafone Idea holds essentially no inventory (12m INR), so subtracting it changes
 nothing and the "quick" ratio collapses onto the current ratio. S&P's stricter
-form counts only cash, short-term investments and receivables — excluding the
-125,000m+ of *other* current assets — and lands 0.05 lower. Neither is wrong. This
+form counts only cash, short-term investments and receivables (excluding the
+125,000m+ of *other* current assets) and lands 0.05 lower. Neither is wrong. This
 project implements the spec's form and records
 `quick_ratio_definition` in `calculation_basis` so the difference is visible
 rather than mysterious.
 
-**Asset turnover — ending vs average balances.**
+**Asset turnover: ending vs average balances.**
 
 ```
 This project (ending assets):  426,517 / 1,849,977                      = 0.23
@@ -207,8 +207,8 @@ S&P (average assets):          426,517 / ((1,849,977 + 2,072,427) / 2)  = 0.22
 ```
 
 Average balances are the more defensible choice when a company's asset base moved
-11% during the year. This is a single-fiscal-year system by design (V1 scope), so
-there is no prior-year balance to average with — `calculation_basis` reports
+11% during the year. This is a single-fiscal-year system (V1 scope), so
+there is no prior-year balance to average with. `calculation_basis` reports
 `turnover_basis: ENDING_BALANCE` rather than calling an ending figure an average.
 Multi-year support is the V2 item that fixes it properly.
 
@@ -218,12 +218,12 @@ Multi-year support is the V2 item that fixes it properly.
 
 **Missing is not zero.** `line_items.get` returns `None` for an absent item and
 never coerces it to `0.0`. A quick ratio computed with inventory silently
-defaulted to zero *equals the current ratio* — a wrong number that looks entirely
+defaulted to zero equals the current ratio: a wrong number that looks entirely
 reasonable. Every engine reports what it could not compute and why; those
 omissions are stored as data, not logged.
 
 **Ratios that are undefined are withheld, not reported.** Vodafone Idea's ROE
-naively computes to **+29.99%** — a loss of −312,387 divided by equity of
+naively computes to **+29.99%** from a loss of −312,387 divided by equity of
 −1,041,668. That reads as strong performance for a company whose liabilities
 exceed its assets. ROE and debt-to-equity are both withheld at non-positive
 equity, with the reason attached. `test_negative_equity_withholds_roe_and_debt_to_equity`
@@ -239,9 +239,9 @@ four health weights do not sum to 1.0. An unnormalised weight vector silently
 rescales every score, so the 0–100 range would stop meaning what the docs say.
 
 **The health composite saturates.** Twice the benchmark scores 100 and nothing
-scores higher. Without the cap, one freak ratio — a quick ratio of 30 because the
-company just raised equity — would drag the composite up and the range would stop
-meaning anything.
+scores higher. Without the cap, a single freak ratio (a quick ratio of 30 because
+the company just raised equity) would drag the composite up and the range would
+stop meaning anything.
 
 **A dropped component renormalises rather than scoring zero.** A company that
 discloses no income statement is not thereby unhealthy. The remaining weights are
@@ -278,13 +278,13 @@ live rather than hardcoding the values.
 matters.** The 1968 Z-score is five multiplications and an addition; anyone can
 write it in ten minutes. Working out that it does not apply to Infosys, that
 substituting book equity into it is not the same as using Z′, and that a bank
-should get no score at all took considerably longer than writing the arithmetic —
-and it is the only part of this module that would survive scrutiny from someone who
-actually uses these models.
+should get no score at all took considerably longer than writing the arithmetic.
+It is also the only part of this module that would survive scrutiny from someone
+who actually uses these models.
 
 **Refusing to produce a number is a feature, and it is the hardest one to build.**
-Every refusal in this codebase — ROE at negative equity, no Z-score for financial
-issuers, `peer_percentile` left null, an unbalanced sheet rejected — started as a
+Every refusal in this codebase (ROE at negative equity, no Z-score for financial
+issuers, `peer_percentile` left null, an unbalanced sheet rejected) started as a
 number the code would happily have returned. Each one required deciding that a
 missing answer beats a confident wrong one, then finding somewhere in the response
 to explain the absence so it reads as a decision rather than a gap.
@@ -298,7 +298,7 @@ read.
 
 **Discovering that S&P and I disagreed on the quick ratio was more useful than
 agreeing would have been.** The first instinct was that something was broken. It
-was a different — and arguably better — definition. Writing down which form is
+It was a different, and arguably better, definition. Writing down which form is
 implemented and why turned a suspected bug into the most interesting paragraph in
 these docs, and it is now the thing I would rather be asked about than the
 Z-score itself.

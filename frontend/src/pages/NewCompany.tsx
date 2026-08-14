@@ -8,17 +8,17 @@ const SECTOR_OPTIONS: { value: SectorClass; label: string; hint: string }[] = [
   {
     value: "PUBLIC_MANUFACTURER",
     label: "Public manufacturer",
-    hint: "Altman Z (1968) applies as published — needs market value of equity at FY end.",
+    hint: "Altman Z (1968) applies as published, needs market value of equity at FY end.",
   },
   {
     value: "PRIVATE_MANUFACTURER",
     label: "Private manufacturer",
-    hint: "Altman Z′ — book value of equity, re-estimated coefficients.",
+    hint: "Altman Z′, book value of equity, re-estimated coefficients.",
   },
   {
     value: "NON_MANUFACTURER",
     label: "Non-manufacturer",
-    hint: "Altman Z″ — drops sales/assets. Services, telecom, retail, IT.",
+    hint: "Altman Z″, drops sales/assets. Services, telecom, retail, IT.",
   },
   {
     value: "FINANCIAL",
@@ -201,7 +201,7 @@ export default function NewCompany() {
           Balance sheet
         </h2>
         <p className="mb-3 text-xs text-muted">
-          Assets must equal liabilities plus equity within 0.5%, or the upload is rejected —
+          Assets must equal liabilities plus equity within 0.5%, or the upload is rejected -
           every asset-scaled ratio would inherit a transcription error. Leave a field blank if
           the filing does not disclose it; the engine will omit the ratios that need it rather
           than assume zero.

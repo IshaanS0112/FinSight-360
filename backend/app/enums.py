@@ -30,8 +30,8 @@ class AltmanModel(str, Enum):
     rule and its consequences live in ``services/altman_zscore.py``.
     """
 
-    Z_1968 = "Z_1968"          # Altman (1968), public manufacturers
-    Z_PRIME = "Z_PRIME"        # Altman (1983), private manufacturers
+    Z_1968 = "Z_1968"  # Altman (1968), public manufacturers
+    Z_PRIME = "Z_PRIME"  # Altman (1983), private manufacturers
     Z_DOUBLE_PRIME = "Z_DOUBLE_PRIME"  # Altman (1995/2005), non-manufacturers & emerging markets
 
 
@@ -39,14 +39,14 @@ class Zone(str, Enum):
     SAFE = "SAFE"
     GREY = "GREY"
     DISTRESS = "DISTRESS"
-    NOT_APPLICABLE = "NOT_APPLICABLE"   # financial-sector issuer; see altman_zscore.py
+    NOT_APPLICABLE = "NOT_APPLICABLE"  # financial-sector issuer; see altman_zscore.py
 
 
 class SectorClass(str, Enum):
     """Coarse sector class, because it changes which Z model is valid.
 
-    Deliberately not a full industry taxonomy. It has exactly the three values
-    the model-selection rule needs, and one of them is a refusal.
+    Not a full industry taxonomy. It carries exactly the values the
+    model-selection rule needs, and one of them is a refusal.
     """
 
     PUBLIC_MANUFACTURER = "PUBLIC_MANUFACTURER"
@@ -58,15 +58,15 @@ class SectorClass(str, Enum):
 class ResultConfidence(str, Enum):
     """Whether every input the formula wants was actually supplied."""
 
-    COMPLETE = "COMPLETE"    # all components computed from reported line items
-    PARTIAL = "PARTIAL"      # one or more components omitted; see omitted_components
-    UNUSABLE = "UNUSABLE"    # too little data to report a score at all
+    COMPLETE = "COMPLETE"  # all components computed from reported line items
+    PARTIAL = "PARTIAL"  # one or more components omitted; see omitted_components
+    UNUSABLE = "UNUSABLE"  # too little data to report a score at all
 
 
 class BenchmarkBasis(str, Enum):
-    PEER_SET = "PEER_SET"               # median of the peer companies loaded
-    REFERENCE_TABLE = "REFERENCE_TABLE" # configured reference band
-    UNAVAILABLE = "UNAVAILABLE"         # metric skipped, no comparison point
+    PEER_SET = "PEER_SET"  # median of the peer companies loaded
+    REFERENCE_TABLE = "REFERENCE_TABLE"  # configured reference band
+    UNAVAILABLE = "UNAVAILABLE"  # metric skipped, no comparison point
 
 
 class NarrativeSource(str, Enum):

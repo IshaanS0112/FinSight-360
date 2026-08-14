@@ -2,11 +2,10 @@
 
 ⚠️ THE SHIPPED REFERENCE BANDS ARE ILLUSTRATIVE ROUND NUMBERS, NOT SOURCED
 INDUSTRY DATA. They are plausible orders of magnitude so the engine has
-something to compare against out of the box. They are deliberately not
-attributed to any data provider, because inventing an attribution would be worse
-than admitting the numbers are placeholders. The project spec explicitly says
-not to claim a proprietary industry-benchmark database, and this is that promise
-kept in code.
+something to compare against out of the box. They are not attributed to any
+data provider, because inventing an attribution would be worse than admitting
+the numbers are placeholders. This project does not claim a proprietary
+industry-benchmark database, and the code reflects that.
 
 Three paths to a comparison point, in precedence order:
 
@@ -50,23 +49,37 @@ class RatioRule:
 RATIO_RULES: tuple[RatioRule, ...] = (
     RatioRule("current_ratio", "Current ratio", RatioCategory.LIQUIDITY, True),
     RatioRule("quick_ratio", "Quick ratio", RatioCategory.LIQUIDITY, True),
-    RatioRule("roe", "Return on equity", RatioCategory.PROFITABILITY, True,
-              note="Meaningless when equity is negative; the engine reports it as unavailable, not as a large number."),
+    RatioRule(
+        "roe",
+        "Return on equity",
+        RatioCategory.PROFITABILITY,
+        True,
+        note="Meaningless when equity is negative; the engine reports it as unavailable, not as a large number.",
+    ),
     RatioRule("roa", "Return on assets", RatioCategory.PROFITABILITY, True),
     RatioRule("net_margin", "Net margin", RatioCategory.PROFITABILITY, True),
     RatioRule("gross_margin", "Gross margin", RatioCategory.PROFITABILITY, True),
-    RatioRule("debt_to_equity", "Debt-to-equity", RatioCategory.LEVERAGE, False,
-              note="Lower is better as a solvency signal. Undefined at negative equity."),
+    RatioRule(
+        "debt_to_equity",
+        "Debt-to-equity",
+        RatioCategory.LEVERAGE,
+        False,
+        note="Lower is better as a solvency signal. Undefined at negative equity.",
+    ),
     RatioRule("interest_coverage", "Interest coverage", RatioCategory.LEVERAGE, True),
     RatioRule("asset_turnover", "Asset turnover", RatioCategory.EFFICIENCY, True),
-    RatioRule("inventory_turnover", "Inventory turnover", RatioCategory.EFFICIENCY, True,
-              note="Undefined for a company holding effectively no inventory, which is normal for services."),
+    RatioRule(
+        "inventory_turnover",
+        "Inventory turnover",
+        RatioCategory.EFFICIENCY,
+        True,
+        note="Undefined for a company holding effectively no inventory, which is normal for services.",
+    ),
 )
 
 RULE_BY_KEY: dict[str, RatioRule] = {rule.key: rule for rule in RATIO_RULES}
 RULES_BY_CATEGORY: dict[RatioCategory, tuple[RatioRule, ...]] = {
-    category: tuple(r for r in RATIO_RULES if r.category is category)
-    for category in RatioCategory
+    category: tuple(r for r in RATIO_RULES if r.category is category) for category in RatioCategory
 }
 
 
@@ -182,7 +195,7 @@ def peer_median(peer_ratios: list[dict[str, float]], ratio_key: str, minimum: in
         float(ratios[ratio_key])
         for ratios in peer_ratios
         if isinstance(ratios, dict)
-        and isinstance(ratios.get(ratio_key), (int, float))
+        and isinstance(ratios.get(ratio_key), int | float)
         and not isinstance(ratios.get(ratio_key), bool)
     ]
     if len(values) < minimum:

@@ -17,6 +17,7 @@ def omitted_reason(result, key: str) -> str:
 
 # --- Arithmetic against hand-computed values ---------------------------------
 
+
 def test_caterpillar_ratios_match_hand_computation(cat_items):
     r = compute_ratios(cat_items)
     assert r.confidence is ResultConfidence.COMPLETE
@@ -66,6 +67,7 @@ def test_definitional_differences_are_recorded(cat_items):
 
 
 # --- Refusals ----------------------------------------------------------------
+
 
 def test_negative_equity_withholds_roe_and_debt_to_equity(vi_items):
     """The single most important refusal in the engine.

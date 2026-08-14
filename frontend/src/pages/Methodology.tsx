@@ -4,9 +4,9 @@ import { api } from "../api/client";
 import type { AltmanModelName, Methodology as MethodologyPayload } from "../api/types";
 
 const MODEL_LABEL: Record<AltmanModelName, string> = {
-  Z_1968: "Altman Z (1968) — public manufacturers",
-  Z_PRIME: "Altman Z′ — private manufacturers",
-  Z_DOUBLE_PRIME: "Altman Z″ — non-manufacturers & emerging markets",
+  Z_1968: "Altman Z (1968), public manufacturers",
+  Z_PRIME: "Altman Z′, private manufacturers",
+  Z_DOUBLE_PRIME: "Altman Z″, non-manufacturers & emerging markets",
 };
 
 /**

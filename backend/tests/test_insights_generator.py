@@ -51,6 +51,7 @@ def context(cat_items, caterpillar, settings):
 
 # --- The context is complete before the model is called ----------------------
 
+
 def test_every_reportable_figure_exists_before_the_llm_runs(context):
     """The central claim, asserted rather than described.
 
@@ -87,6 +88,7 @@ def test_context_is_json_serialisable(context):
 
 # --- The fallback ------------------------------------------------------------
 
+
 def test_no_api_key_falls_back_and_says_why(context, settings):
     narrative = generate_narrative(context, settings)
     assert narrative["generated_by"] == NarrativeSource.TEMPLATE_FALLBACK.value
@@ -100,23 +102,30 @@ def test_fallback_still_reports_every_number(context, settings):
     assert narrative["key_findings"]
 
 
-def test_fallback_for_a_financial_issuer_does_not_estimate_a_score(
-    infy_items, infosys, settings
-):
+def test_fallback_for_a_financial_issuer_does_not_estimate_a_score(infy_items, infosys, settings):
     ratios = compute_ratios(infy_items)
-    risk = compute_z_score(
-        items=infy_items, sector_class=SectorClass.FINANCIAL, settings=settings
-    )
+    risk = compute_z_score(items=infy_items, sector_class=SectorClass.FINANCIAL, settings=settings)
     table, provenance = load_reference_bands(None)
     health = compute_health_score(
-        ratios=ratios, industry="it services", peer_ratios=[],
-        reference_table=table, reference_provenance=provenance, settings=settings,
+        ratios=ratios,
+        industry="it services",
+        peer_ratios=[],
+        reference_table=table,
+        reference_provenance=provenance,
+        settings=settings,
     )
     ctx = build_structured_context(
-        company_id="x", company_name="A Bank", industry="banking",
-        sector_class=SectorClass.FINANCIAL.value, fiscal_year=2024,
-        currency="USD", units="MILLIONS", data_source="test",
-        ratios=ratios, risk=risk, health=health,
+        company_id="x",
+        company_name="A Bank",
+        industry="banking",
+        sector_class=SectorClass.FINANCIAL.value,
+        fiscal_year=2024,
+        currency="USD",
+        units="MILLIONS",
+        data_source="test",
+        ratios=ratios,
+        risk=risk,
+        health=health,
     )
     narrative = generate_narrative(ctx, settings)
     assert "No Altman score was produced" in narrative["bankruptcy_risk_assessment"]
@@ -130,13 +139,25 @@ def test_partial_confidence_drives_the_recommendation(vi_items, settings):
     )
     table, provenance = load_reference_bands(None)
     health = compute_health_score(
-        ratios=ratios, industry="telecom", peer_ratios=[],
-        reference_table=table, reference_provenance=provenance, settings=settings,
+        ratios=ratios,
+        industry="telecom",
+        peer_ratios=[],
+        reference_table=table,
+        reference_provenance=provenance,
+        settings=settings,
     )
     ctx = build_structured_context(
-        company_id="x", company_name="Vodafone Idea Limited", industry="telecom",
-        sector_class="NON_MANUFACTURER", fiscal_year=2024, currency="INR",
-        units="MILLIONS", data_source="test", ratios=ratios, risk=risk, health=health,
+        company_id="x",
+        company_name="Vodafone Idea Limited",
+        industry="telecom",
+        sector_class="NON_MANUFACTURER",
+        fiscal_year=2024,
+        currency="INR",
+        units="MILLIONS",
+        data_source="test",
+        ratios=ratios,
+        risk=risk,
+        health=health,
     )
     narrative = generate_narrative(ctx, settings)
     assert "partial sum" in narrative["recommendation"]
@@ -146,22 +167,31 @@ def test_partial_confidence_drives_the_recommendation(vi_items, settings):
 
 # --- Validation of model output ----------------------------------------------
 
+
 def _model_reply(findings: list[dict]) -> str:
-    return json.dumps({
-        "executive_summary": "summary",
-        "bankruptcy_risk_assessment": "assessment",
-        "key_findings": findings,
-        "data_limitations": "none",
-        "recommendation": "next step",
-    })
+    return json.dumps(
+        {
+            "executive_summary": "summary",
+            "bankruptcy_risk_assessment": "assessment",
+            "key_findings": findings,
+            "data_limitations": "none",
+            "recommendation": "next step",
+        }
+    )
 
 
 def test_hallucinated_metric_citations_are_dropped(context):
-    raw = _model_reply([
-        {"metric": "current_ratio", "observation": "1.42", "implication": "adequate"},
-        {"metric": "ebitda_to_sponsor_adjusted_leverage", "observation": "invented", "implication": "x"},
-        {"metric": "x1", "observation": "0.15", "implication": "positive working capital"},
-    ])
+    raw = _model_reply(
+        [
+            {"metric": "current_ratio", "observation": "1.42", "implication": "adequate"},
+            {
+                "metric": "ebitda_to_sponsor_adjusted_leverage",
+                "observation": "invented",
+                "implication": "x",
+            },
+            {"metric": "x1", "observation": "0.15", "implication": "positive working capital"},
+        ]
+    )
     result = _validate_narrative(raw, context)
     assert [f["metric"] for f in result["key_findings"]] == ["current_ratio", "x1"]
     assert result["dropped_citations"] == 1
@@ -176,13 +206,25 @@ def test_omitted_ratio_cannot_be_cited(vi_items, settings):
     )
     table, provenance = load_reference_bands(None)
     health = compute_health_score(
-        ratios=ratios, industry="telecom", peer_ratios=[],
-        reference_table=table, reference_provenance=provenance, settings=settings,
+        ratios=ratios,
+        industry="telecom",
+        peer_ratios=[],
+        reference_table=table,
+        reference_provenance=provenance,
+        settings=settings,
     )
     ctx = build_structured_context(
-        company_id="x", company_name="Vodafone Idea Limited", industry="telecom",
-        sector_class="NON_MANUFACTURER", fiscal_year=2024, currency="INR",
-        units="MILLIONS", data_source="test", ratios=ratios, risk=risk, health=health,
+        company_id="x",
+        company_name="Vodafone Idea Limited",
+        industry="telecom",
+        sector_class="NON_MANUFACTURER",
+        fiscal_year=2024,
+        currency="INR",
+        units="MILLIONS",
+        data_source="test",
+        ratios=ratios,
+        risk=risk,
+        health=health,
     )
     result = _validate_narrative(
         _model_reply([{"metric": "roe", "observation": "29.99%", "implication": "strong"}]), ctx

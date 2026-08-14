@@ -94,9 +94,8 @@ class InsightReport(Base):
         Uuid, ForeignKey("companies.id", ondelete="CASCADE"), nullable=False, index=True
     )
 
-    # Stored beside the narrative on purpose. Every figure the narrative is
-    # allowed to mention exists here first, so "the AI did not invent this"
-    # is checkable by diffing the two rather than taken on trust.
+    # Every figure the narrative may mention exists here first, so the claim
+    # that no number was invented can be checked by diffing the two.
     structured_context: Mapped[dict] = mapped_column(JsonBlob, nullable=False, default=dict)
     ai_narrative: Mapped[dict] = mapped_column(JsonBlob, nullable=False, default=dict)
     generated_by: Mapped[str] = mapped_column(String(30), nullable=False)

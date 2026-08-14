@@ -22,9 +22,7 @@ from app.services.benchmarks import load_reference_bands
 from app.services.line_items import ITEM_BY_KEY
 from app.services.ratio_engine import FORMULAS, PERCENT_RATIOS
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 logger = logging.getLogger("finsight360")
 
 

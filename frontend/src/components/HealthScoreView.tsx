@@ -11,9 +11,9 @@ function barColour(score: number): string {
 /**
  * The composite, its components, and the fact that it is not an established model.
  *
- * The "project-defined composite" line is deliberately at the top rather than in
- * a footnote. The Altman score above it is a published model; this one is not, and
- * presenting them with equal authority would be the misleading part.
+ * The "project-defined composite" line sits at the top rather than in a footnote.
+ * The Altman score above it is a published model; this one is not, and presenting
+ * them with equal authority would mislead.
  */
 export default function HealthScoreView({ health }: { health: HealthScore }) {
   const basis = health.calculation_basis;
@@ -32,7 +32,7 @@ export default function HealthScoreView({ health }: { health: HealthScore }) {
           </p>
         </div>
         <div className="stat text-3xl font-semibold text-slate-100">
-          {health.overall_score ?? "—"}
+          {health.overall_score ?? "-"}
           <span className="text-base text-muted">/100</span>
         </div>
       </div>
@@ -76,7 +76,7 @@ export default function HealthScoreView({ health }: { health: HealthScore }) {
       <div className="mt-4 space-y-2 text-xs text-muted">
         <p>
           <span className="text-slate-400">Peer percentile:</span>{" "}
-          {health.peer_percentile ?? "withheld — see methodology"}
+          {health.peer_percentile ?? "withheld, see methodology"}
         </p>
         <p className="leading-relaxed">
           <span className="text-slate-400">Benchmarks:</span> {basis.benchmark_provenance}

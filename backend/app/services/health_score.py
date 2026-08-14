@@ -35,7 +35,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from app.config import Settings
-from app.enums import BenchmarkBasis, RatioCategory, ResultConfidence
+from app.enums import RatioCategory, ResultConfidence
 from app.services.benchmarks import (
     RULES_BY_CATEGORY,
     resolve_benchmark,
@@ -145,7 +145,7 @@ def compute_health_score(
             "minimum_required": settings.health_min_metrics_per_component,
         }
 
-    weights = {k: v for k, v in settings.health_weights.items()}
+    weights = dict(settings.health_weights)
     available = {k: v for k, v in component_scores.items() if v is not None}
 
     if not available:
@@ -205,13 +205,11 @@ def compute_health_score(
 
 
 def _peer_percentile(score: float, peer_ratios: list[dict[str, float]]) -> float | None:
-    """Withheld by design.
+    """Not populated in V1.
 
-    A percentile needs a distribution. With the handful of peers this system is
-    scoped to hold, any number here would be a percentile of three or four
-    companies presented as if it were an industry position - which is exactly the
-    kind of claim the project spec says not to make. The field stays ``None``
-    until a real reference population is loaded, and ``calculation_basis``
-    records why.
+    A percentile needs a distribution. With the handful of peers this system
+    holds, any value here would be a percentile of three or four companies
+    presented as an industry position. The field stays ``None`` until a real
+    reference population is loaded, and ``calculation_basis`` records why.
     """
     return None
