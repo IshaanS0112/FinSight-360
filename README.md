@@ -1,8 +1,14 @@
 # FinSight 360
 
+[![CI](https://github.com/IshaanS0112/FinSight-360/actions/workflows/ci.yml/badge.svg)](https://github.com/IshaanS0112/FinSight-360/actions/workflows/ci.yml)
+[![Tests](https://img.shields.io/badge/tests-88%20passing-brightgreen)](backend/tests)
+[![Python](https://img.shields.io/badge/python-3.12-blue)](backend/requirements.txt)
+[![React](https://img.shields.io/badge/react-18-61dafb)](frontend/package.json)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
 **Corporate financial health and risk intelligence.** A ratio engine, the Altman
 bankruptcy models applied to the population each was actually estimated on, and a
-weighted health composite benchmarked against peers — with an LLM that writes the
+weighted health composite benchmarked against peers, with an LLM that writes the
 assessment up and computes none of it.
 
 FastAPI · PostgreSQL · React + TypeScript + Tailwind · Docker · Claude API
@@ -12,7 +18,7 @@ FastAPI · PostgreSQL · React + TypeScript + Tailwind · Docker · Claude API
 ## Why I built this
 
 I got interested in credit analysis after reading about the Altman Z-score and
-realising it was a 1968 linear discriminant function that banks still use — five
+realising it was a 1968 linear discriminant function that banks still use. Five
 ratios, five coefficients, three zones, and a paper you can read in an afternoon.
 It is unusually honest for a risk model: no black box, no fitted neural net, just
 a formula whose weights you can argue with.
@@ -21,8 +27,8 @@ Then I found the interesting part. The 1968 model was estimated on **publicly
 traded manufacturers**. Almost every online Z-score calculator applies it to
 anything with a balance sheet, which means most Z-scores you see for services,
 telecom, or retail companies are technically misapplications. Altman published
-corrections for exactly this — Z′ for private firms, Z″ for non-manufacturers and
-emerging markets — and they are much less widely implemented.
+corrections for exactly this: Z′ for private firms, Z″ for non-manufacturers and
+emerging markets. Both are much less widely implemented.
 
 So this project implements all three, chooses between them from the company's
 sector class, and **refuses to score banks at all**, because Altman excluded
@@ -40,7 +46,7 @@ code and tested, not just promised in a README.
 Upload a company's financial statement line items, and it:
 
 1. **Computes ten ratios** across liquidity, profitability, leverage and
-   efficiency — and reports which ones it *could not* compute, and why.
+   efficiency, and reports which ones it could not compute, and why.
 2. **Selects and runs the applicable Altman model** (Z, Z′ or Z″) based on sector
    class, decomposed term by term so you can see which component drove the verdict.
 3. **Scores a weighted health composite** against a peer median or a configured
@@ -62,15 +68,15 @@ Two validation pairs from real filings, one per model variant:
 | Vodafone Idea Ltd | 2024 | non-manufacturer | **Z″** | −5.9633 | **DISTRESS** | negative net worth of −₹1,041,668m ✓ |
 
 Every figure is reproduced by `backend/tests/test_altman_zscore.py`, which reads
-the sample filing JSON directly — edit a filing to a value that no longer produces
+the sample filing JSON directly. Edit a filing to a value that no longer produces
 the documented verdict and CI fails.
 
 **And the honest caveat, because it matters more than the three ticks:** Vodafone
 Idea's score is reported as `confidence: PARTIAL`. Its operating income is not
 published in the source used and is not derivable from what is, so `x3` is listed
 in `omitted_components` and the score is a four-term partial sum. The verdict does
-not depend on the missing term — the remaining four land at −5.96 against a
-distress cutoff of 1.10 — but the response says it is partial rather than
+not depend on the missing term: the remaining four land at −5.96 against a
+distress cutoff of 1.10. The response still reports it as partial rather than
 presenting a complete-looking number. Full provenance for all three companies,
 including the two derived figures, is in
 [`data/sample_filings/README.md`](data/sample_filings/README.md).
@@ -81,13 +87,11 @@ XBRL extraction from the 10-K (`87,764,000,000`), reproducible via
 
 ---
 
-## Run it
-
-Full step-by-step setup, verification checks and troubleshooting:
-**[RUNNING.md](RUNNING.md)**. The short version:
+## Quick start
 
 ```bash
-git clone <this repo> && cd FinSight360
+git clone https://github.com/IshaanS0112/AlphaRisk-IQ.git
+cd AlphaRisk-IQ
 
 # Optional: without it, insight reports use the deterministic template fallback.
 # Every ratio, Z-score and health score is identical either way.
@@ -115,7 +119,7 @@ Loading 3 sample filing(s) into http://localhost:8000
 ```
 
 Caterpillar and Infosys land close together on the health composite (63.8 vs 65.1)
-despite very different balance sheets — Caterpillar scores far higher on
+despite very different balance sheets. Caterpillar scores far higher on
 profitability, Infosys on leverage and efficiency. That is the composite behaving
 as designed rather than a bug, and it is a fair illustration of why a single
 blended number is the least informative output in this system. The component
@@ -124,15 +128,51 @@ breakdown and the Z-score are the useful parts.
 ### Tests, with nothing running
 
 ```bash
-cd backend && pip install -r requirements-dev.txt && pytest
+cd backend
+pip install -r requirements-dev.txt
+pytest
 ```
 
 **88 tests, no database container required.** The SQLAlchemy models declare JSONB
 and UUID as *dialect variants*, so the same schema loads on SQLite and the API
 integration tests exercise the real FastAPI app end to end on a fresh clone. The
-engine tests import the computation functions directly — no database, no network,
-no model — because every analytical claim this project makes is a claim about
-those functions.
+engine tests import the computation functions directly, with no database, no
+network and no model, because every analytical claim this project makes is a
+claim about those functions.
+
+### Local development without Docker
+
+Requires Python 3.10+ and Node 18+.
+
+```bash
+# Terminal 1: API on :8000
+cd backend
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements-dev.txt
+export DATABASE_URL="sqlite:///./finsight.db"
+uvicorn app.main:app --reload
+
+# Terminal 2: dashboard on :5173, proxying /api to :8000
+cd frontend
+npm ci
+npm run dev
+```
+
+SQLite is fine locally and is what the test suite uses. Postgres is the
+deployment target; the models declare JSONB and UUID as dialect variants so the
+same schema loads on both, and no analysis output differs between them.
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `DATABASE_URL` | `postgresql+psycopg2://finsight:finsight@localhost:5432/finsight360` | Connection string. Accepts any SQLAlchemy URL. |
+| `ANTHROPIC_API_KEY` | empty | Optional. Empty means insight reports use the template fallback. |
+| `ANTHROPIC_MODEL` | `claude-sonnet-4-5` | Model used for narration only. |
+| `REFERENCE_BENCHMARKS_PATH` | empty | Path to your own sourced benchmark table. |
+| `CORS_ORIGINS` | `http://localhost:5173,http://localhost:3000` | Comma-separated allowed origins. |
+
+Every Altman coefficient, cutoff and health-score weight is also overridable by
+environment variable; `GET /methodology` reports the values actually in force.
+See `backend/.env.example`.
 
 ---
 
@@ -155,13 +195,12 @@ X5 = sales / total assets                asset productivity (dropped in Z″)
 ```
 
 Selection is by **sector class, not by which inputs happen to be present**. A
-public manufacturer with no fiscal-year-end market cap gets Z′ — not Z-1968 with
-book equity substituted in, which is a common shortcut and is wrong, because Z′
-re-estimated every coefficient precisely to account for that switch.
+public manufacturer with no fiscal-year-end market cap gets Z′, not Z-1968 with
+book equity substituted in. That substitution is a common shortcut and it is
+wrong: Z′ re-estimated every coefficient to account for the switch.
 
 `docs/architecture.md` constructs a company scoring **2.74 (SAFE) under Z″ and
-1.36 (DISTRESS) under the 1968 coefficients** — same balance sheet, opposite
-verdict. That test is why selection is not left to the caller.
+1.36 (DISTRESS) under the 1968 coefficients** on the same balance sheet. That test is why selection is not left to the caller.
 
 ### Ratios
 
@@ -174,12 +213,12 @@ Efficiency     asset turnover, inventory turnover
 
 Ratio definitions genuinely disagree between providers, so the form implemented is
 recorded in every response. `docs/architecture.md` works through two real
-disagreements against published S&P figures for Vodafone Idea — a quick ratio 0.05
+disagreements against published S&P figures for Vodafone Idea: a quick ratio 0.05
 apart on definition, and an asset turnover 0.01 apart on ending-vs-average
-balances — alongside a Caterpillar gross margin that ties to the published 37.97%
-exactly.
+balances. It also shows a Caterpillar gross margin that ties to the published
+37.97% exactly.
 
-### Health score — a composite this project defines
+### Health score: a composite this project defines
 
 ```
 health = 0.35·profitability + 0.25·liquidity + 0.20·leverage + 0.20·efficiency
@@ -195,13 +234,13 @@ disagree with the specific values rather than guess at them.
 ## Design decisions worth defending
 
 **Missing is never zero.** A quick ratio computed with inventory silently
-defaulted to zero *equals the current ratio* — a wrong number that looks entirely
+defaulted to zero equals the current ratio: a wrong number that looks entirely
 reasonable. Absent line items omit the ratios that need them, and the omission is
 stored as data with a reason.
 
 **Undefined ratios are withheld, not reported.** Vodafone Idea's ROE naively
-computes to **+29.99%** — a ₹312bn loss divided by negative equity. That reads as
-strong performance for a company whose liabilities exceed its assets. ROE and
+computes to **+29.99%** from a ₹312bn loss divided by negative equity, which reads
+as strong performance for a company whose liabilities exceed its assets. ROE and
 debt-to-equity are withheld at non-positive equity; the test asserts the naive
 value *would* have been positive, so it documents the trap it prevents.
 
@@ -224,9 +263,9 @@ Every scored ratio reports which basis produced its benchmark.
 **The LLM narrates and cannot introduce a figure.** The full structured context is
 frozen before the call, stored beside the narrative, and returned by the API. Any
 metric the model cites that is not in that context is dropped and counted. So
-"the AI did not invent this" is checkable by diffing the two, not taken on trust —
-and with no API key configured, the template fallback produces the same report
-minus the prose.
+the claim that nothing was invented is checkable by diffing the two rather than
+taken on trust. With no API key configured, the template fallback produces the
+same report minus the prose.
 
 ---
 
@@ -292,15 +331,15 @@ FinSight360/
 
 ## Roadmap
 
-**V2 — multi-year trend analysis.** The single biggest limitation. One fiscal year
+**V2: multi-year trend analysis.** The single biggest limitation. One fiscal year
 cannot distinguish a stable position from a deteriorating one, and it is also why
 turnover ratios currently use ending rather than average balances.
 
-**V2 — DCF valuation.** Deliberately not in V1. Genuinely more complex than a
+**V2: DCF valuation.** Not in V1. Genuinely more complex than a
 ratio table, and rushing it would produce exactly the kind of invented number this
 project exists to avoid.
 
-**V2 — a real reference population**, at which point `peer_percentile` can carry a
+**V2: a real reference population**, at which point `peer_percentile` can carry a
 number instead of a null and an explanation.
 
 **Also queued:** Alembic migrations (needed the moment a column changes shape),
