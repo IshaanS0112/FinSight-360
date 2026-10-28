@@ -1,0 +1,103 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements-dev.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Lint
+        run: |
+          pip install ruff==0.8.4
+          ruff check app tests scripts
+          ruff format --check app tests scripts
+
+      - name: Test
+        # No services block. The models declare JSONB and UUID as dialect
+        # variants, so the API tests run the real app against SQLite.
+        run: pytest -q
+
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type-check
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+
+  validation:
+    name: Sample filings reproduce documented verdicts
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements-dev.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Validate every sample filing against its documented result
+        # These tests read data/sample_filings/*.json directly, so a filing
+        # edited to a value that no longer produces the documented verdict
+        # fails here. test_multi_year_filings.py extends that to the second
+        # fiscal year, and additionally asserts that no companion file
+        # restates a line item in the protected FY2024 fixtures - a
+        # restatement smuggled in through the merge would move a documented
+        # verdict without appearing in any diff a reviewer would look at.
+        run: pytest tests/test_altman_zscore.py tests/test_multi_year_filings.py -q
+
+  docker:
+    name: Docker images build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build backend image
+        run: docker build -t finsight-backend ./backend
+      - name: Build frontend image
+        run: docker build -t finsight-frontend ./frontend

@@ -1,0 +1,104 @@
+{
+  "extends": "caterpillar_fy2024.json",
+  "note": "V2 companion file. It adds the FY2023 comparative year and the FY2024 line items the V2 models need, and it does NOT restate anything already in caterpillar_fy2024.json - every key here is either a new key for FY2024 or a figure for FY2023. That file is a protected regression fixture and stays byte-identical.",
+  "company_ref": "Caterpillar Inc.",
+  "data_source": "SEC XBRL company-facts API, CIK 0000018230, form 10-K. Every figure below was pulled from https://data.sec.gov/api/xbrl/companyfacts/CIK0000018230.json and is the filer's own tagged extraction from its 10-K - a primary source, not a standardised third-party restatement.",
+  "cross_check": "The same pull reproduces the FY2024 figures already in caterpillar_fy2024.json exactly: Revenues 64,809, CostOfRevenue 40,199, OperatingIncomeLoss 13,072, NetIncomeLossAvailableToCommonStockholdersBasic 10,792, RetainedEarningsAccumulatedDeficit 59,352, StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest 19,494, NetCashProvidedByUsedInOperatingActivities 12,035. Total debt 38,409 reconciles as ShortTermBorrowings 4,393 + LongTermDebtMaturitiesRepaymentsOfPrincipalInNextTwelveMonths 6,665 + LongTermDebtNoncurrent 27,351. Capital expenditure 3,215 reconciles as PaymentsToAcquirePropertyPlantAndEquipment 1,988 + PaymentsToAcquireEquipmentOnLease 1,227. An exact tie on seven independently tagged figures is the evidence that the FY2023 figures below are on the same basis.",
+  "expected": {
+    "fiscal_years": [2023, 2024],
+    "consensus_verdict": "LOW_RISK",
+    "piotroski_f_score": 7,
+    "beneish_manipulation_flag": false,
+    "note": "Known-healthy public manufacturer with two clean years. The F-Score misses exactly two tests - long-term debt rose from 24,472 to 27,351 and revenue fell from 67,060 to 64,809 against a flat asset base - which is what a reader of the 10-K would predict."
+  },
+  "statements": [
+    {
+      "fiscal_year": 2024,
+      "statement_type": "BALANCE_SHEET",
+      "source_note": "Caterpillar FY2024 10-K, additional tagged balance-sheet items required by the V2 models. No figure already present in caterpillar_fy2024.json is restated here.",
+      "line_items": {
+        "accounts_receivable": 9282,
+        "accounts_payable": 7675,
+        "ppe_net": 13361,
+        "long_term_debt": 27351,
+        "cash_and_equivalents": 6889,
+        "shares_outstanding": 477.9,
+        "share_price": 371.4752
+      }
+    },
+    {
+      "fiscal_year": 2024,
+      "statement_type": "INCOME_STATEMENT",
+      "source_note": "Caterpillar FY2024 10-K, additional tagged income-statement items required by DuPont's five-step form and by Beneish.",
+      "line_items": {
+        "pretax_income": 13373,
+        "tax_expense": 2785,
+        "sga_expense": 6667,
+        "income_continuing_ops": 10788
+      }
+    },
+    {
+      "fiscal_year": 2024,
+      "statement_type": "CASH_FLOW",
+      "source_note": "Caterpillar FY2024 10-K, DepreciationDepletionAndAmortization. Required by Ohlson's funds-from-operations proxy, by Beneish DEPI, and by the DCF's FCFF bridge.",
+      "line_items": {
+        "depreciation_amortization": 2153
+      }
+    },
+    {
+      "fiscal_year": 2023,
+      "statement_type": "BALANCE_SHEET",
+      "source_note": "Caterpillar FY2023 consolidated balance sheet (FYE 2023-12-31) as tagged in the 10-K. Balances exactly: 87,476 = 67,973 + 19,503.",
+      "line_items": {
+        "total_assets": 87476,
+        "current_assets": 46949,
+        "current_liabilities": 34728,
+        "total_liabilities": 67973,
+        "inventory": 16565,
+        "shareholder_equity": 19503,
+        "retained_earnings": 51250,
+        "total_debt": 37878,
+        "accounts_receivable": 9310,
+        "accounts_payable": 7906,
+        "ppe_net": 12680,
+        "long_term_debt": 24472,
+        "cash_and_equivalents": 6978,
+        "shares_outstanding": 499.4
+      }
+    },
+    {
+      "fiscal_year": 2023,
+      "statement_type": "INCOME_STATEMENT",
+      "source_note": "Caterpillar FY2023 consolidated results (FY ending 2023-12-31) as tagged in the 10-K. interest_expense is deliberately absent - see derivations.",
+      "line_items": {
+        "revenue": 67060,
+        "cogs": 42767,
+        "gross_profit": 24293,
+        "ebit": 12966,
+        "net_income": 10335,
+        "pretax_income": 13050,
+        "tax_expense": 2781,
+        "sga_expense": 6371,
+        "income_continuing_ops": 10332
+      }
+    },
+    {
+      "fiscal_year": 2023,
+      "statement_type": "CASH_FLOW",
+      "source_note": "Caterpillar FY2023 cash flow statement. CapEx presented as a positive magnitude.",
+      "line_items": {
+        "operating_cash_flow": 12885,
+        "capital_expenditure": 3092,
+        "depreciation_amortization": 2144
+      }
+    }
+  ],
+  "derivations": {
+    "total_debt_2023": "37,878 = ShortTermBorrowings 4,643 + LongTermDebtMaturitiesRepaymentsOfPrincipalInNextTwelveMonths 8,763 + LongTermDebtNoncurrent 24,472. The same three-part reconciliation reproduces the FY2024 figure of 38,409 already in the V1 file exactly, which is why this composition is used rather than a different one.",
+    "capital_expenditure_2023": "3,092 = PaymentsToAcquirePropertyPlantAndEquipment 1,597 + PaymentsToAcquireEquipmentOnLease 1,495. Caterpillar splits capital expenditure across two lines because equipment leased to customers is a distinct programme. The same sum reproduces the FY2024 figure of 3,215 in the V1 file exactly.",
+    "gross_profit_2023": "24,293 = revenue 67,060 - cogs 42,767. Caterpillar does not tag GrossProfit; the identity is definitional and the FY2024 file records the same relationship (64,809 - 40,199 = 24,610).",
+    "net_income_2023": "10,335, NetIncomeLossAvailableToCommonStockholdersBasic - profit attributable to common shareholders. ProfitLoss (including non-controlling interests) is 10,332; the two differ by the -3 attributable to non-controlling interests. The V1 file uses the attributable figure for FY2024 (10,792 against a ProfitLoss of 10,788), so the same basis is used here. income_continuing_ops carries ProfitLoss, which is the measure Beneish TATA wants.",
+    "share_price_2024": "371.4752 = market_value_equity 177,528 (already in the V1 file) / shares_outstanding 477.9. Derived from figures already in the project rather than quoting a market close, so the whole chain stays reproducible from one source. It is used only to express the DCF's implied value as an upside or downside; no analysis depends on it.",
+    "interest_expense_2023": "DELIBERATELY OMITTED. Caterpillar tags no interest expense concept anywhere in its XBRL company facts - the income-statement line 'Interest expense excluding Financial Products' is not separately tagged, and InterestPaidNet (1,435 for FY2023) is cash paid, not expense. Rather than substitute a cash figure for an accrual one, the file omits it: interest coverage is reported for FY2024 and omitted for FY2023, and the trend block therefore has nothing to compare. Same discipline as the Vodafone Idea EBIT omission in V1."
+  }
+}

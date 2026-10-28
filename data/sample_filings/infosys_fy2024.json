@@ -1,0 +1,47 @@
+{
+  "company": {
+    "name": "Infosys Limited",
+    "industry": "it services",
+    "sector_class": "NON_MANUFACTURER",
+    "fiscal_year": 2024,
+    "currency": "USD",
+    "units": "MILLIONS",
+    "data_source": "Infosys Limited FY2024 (FYE 2024-03-31), consolidated financial statements as standardised on stockanalysis.com (source: S&P Global Market Intelligence), reported in USD millions."
+  },
+  "expected": {
+    "altman_model": "Z_DOUBLE_PRIME",
+    "zone": "SAFE",
+    "note": "Known-healthy non-manufacturer. Validation control for the Z'' variant, and the reason that variant is needed: the 1968 coefficients were not estimated on services firms."
+  },
+  "statements": [
+    {
+      "statement_type": "BALANCE_SHEET",
+      "source_note": "Infosys FY2024 consolidated balance sheet (FYE 2024-03-31), standardised. Shareholders' equity includes minority interest of 46.",
+      "line_items": {
+        "total_assets": 16523,
+        "current_assets": 10722,
+        "current_liabilities": 4651,
+        "total_liabilities": 5918,
+        "inventory": 43,
+        "shareholder_equity": 10605,
+        "retained_earnings": 14180,
+        "total_debt": 1002
+      }
+    },
+    {
+      "statement_type": "INCOME_STATEMENT",
+      "source_note": "Infosys FY2024 consolidated statement of profit and loss (FY ending 2024-03-31), standardised. Interest expense presented as a positive magnitude; reported as -56.",
+      "line_items": {
+        "revenue": 18562,
+        "cogs": 13096,
+        "gross_profit": 5466,
+        "ebit": 3835,
+        "net_income": 3167,
+        "interest_expense": 56
+      }
+    }
+  ],
+  "derivations": {
+    "note": "No figure in this file is derived. Every line item is transcribed as reported."
+  }
+}

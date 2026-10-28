@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+.pytest_cache/
+.ruff_cache/
+node_modules/
+dist/
+.DS_Store
+*.db
+*.sqlite3
+
+# tsc -b incremental build state; regenerated on every build.
+tsconfig.tsbuildinfo
+frontend/tsconfig.tsbuildinfo

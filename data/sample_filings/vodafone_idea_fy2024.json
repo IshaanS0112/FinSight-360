@@ -1,0 +1,49 @@
+{
+  "company": {
+    "name": "Vodafone Idea Limited",
+    "industry": "telecom",
+    "sector_class": "NON_MANUFACTURER",
+    "fiscal_year": 2024,
+    "currency": "INR",
+    "units": "MILLIONS",
+    "data_source": "Vodafone Idea Limited FY2024 (FYE 2024-03-31), consolidated financial statements as standardised on stockanalysis.com (source: S&P Global Market Intelligence), reported in INR millions."
+  },
+  "expected": {
+    "altman_model": "Z_DOUBLE_PRIME",
+    "zone": "DISTRESS",
+    "confidence": "PARTIAL",
+    "omitted_components": ["x3"],
+    "note": "Known-distressed case. Shareholders' equity is -1,041,668m INR and total liabilities (2,891,645) exceed total assets (1,849,977) by 1,041,668. EBIT is deliberately absent - see derivations."
+  },
+  "statements": [
+    {
+      "statement_type": "BALANCE_SHEET",
+      "source_note": "Vodafone Idea FY2024 consolidated balance sheet (FYE 2024-03-31), standardised.",
+      "line_items": {
+        "total_assets": 1849977,
+        "current_assets": 129098,
+        "current_liabilities": 541413,
+        "total_liabilities": 2891645,
+        "inventory": 12,
+        "shareholder_equity": -1041668,
+        "retained_earnings": -2339687,
+        "total_debt": 2438090,
+        "market_value_equity": 664088
+      }
+    },
+    {
+      "statement_type": "INCOME_STATEMENT",
+      "source_note": "Vodafone Idea FY2024 revenue and net loss. EBIT is NOT included - see derivations.",
+      "line_items": {
+        "revenue": 426517,
+        "net_income": -312387
+      }
+    }
+  ],
+  "derivations": {
+    "revenue": "426,517m INR (Rs 42,651.7 crore) as reported for FY2024. Cross-checked against two independently published S&P ratios for the same year: PS 1.56 x market cap 664,088 = 425,697, and EV 3,064,358 / (EV/Sales 7.20) = 425,605. Both within 0.25%.",
+    "net_income": "-312,387m INR, from published FY2024 earnings yield -47.04% x market cap 664,088. Independently corroborated by the retained earnings movement: -2,339,687 - (-2,031,621) = -308,066.",
+    "ebit": "DELIBERATELY OMITTED. Operating income is not published as a standardised line item in the source used, and deriving it from EBITDA would require a depreciation and amortisation figure that is also unavailable. Rather than invent it, the file omits it: the engine reports confidence PARTIAL, lists x3 in omitted_components, and still returns DISTRESS from the four remaining terms. Covered by test_altman_zscore.py::test_vodafone_idea_partial_but_decisive.",
+    "market_value_equity": "664,088m INR, published FY2024 market capitalisation. Not used by Z'' (whose X4 takes BOOK equity) - included so the misapplication of the 1968 model to a non-manufacturer can be demonstrated, as it is in the tests."
+  }
+}

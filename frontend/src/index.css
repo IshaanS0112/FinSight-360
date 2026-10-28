@@ -1,0 +1,213 @@
+/*
+  FinSight 360 on the Paper theme (house design system, light only).
+
+  The workpaper concept stays: numbered schedules, auditor tickmarks and one
+  stamped verdict. Colour now follows the house rules - one cobalt accent at
+  about 5% of the screen, greys doing the rest, and status colours (success,
+  warning, destructive) reserved for risk zones, always paired with a label.
+*/
+
+@import "tailwindcss";
+
+:root {
+  color-scheme: light;
+  --radius: 4px;
+
+  --background: #F6F5F1;
+  --foreground: #15171A;
+  --card: #FFFFFF;
+  --card-foreground: #15171A;
+  --popover: #FFFFFF;
+  --popover-foreground: #15171A;
+
+  --primary: #1D3FD8;
+  --primary-foreground: #FFFFFF;
+
+  --secondary: #EFEDE6;
+  --secondary-foreground: #15171A;
+  --muted: #EFEDE6;
+  --muted-foreground: #5B5F66;
+  --accent: #EFEDE6;
+  --accent-foreground: #15171A;
+
+  --destructive: #C2362F;
+  --success: #0F8A5F;
+  --warning: #B7791F;
+  --info: #1D3FD8;
+
+  --border: #E2DFD6;
+  --border-strong: #C9C5B9;
+  --input: #C9C5B9;
+  --ring: #1D3FD8;
+
+  --surface-2: #EFEDE6;
+  --text-subtle: #8C9097;
+  --brand-tint: rgba(29, 63, 216, 0.08);
+
+  --chart-1: #1D3FD8;
+  --chart-2: #8C9097;
+  --chart-3: #C9C5B9;
+  --chart-4: #E0703A;
+
+  --shadow-popover: 0 8px 24px rgba(21, 23, 26, 0.08);
+}
+
+@theme inline {
+  --font-sans: var(--font-geist, "Geist"), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-instrument-serif, "Instrument Serif"), Georgia, "Times New Roman", serif;
+  --font-mono: var(--font-geist-mono, "Geist Mono"), ui-monospace, SFMono-Regular, monospace;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-info: var(--info);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-surface-2: var(--surface-2);
+  --color-subtle: var(--text-subtle);
+  --color-brand-tint: var(--brand-tint);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+
+  --radius-sm: 2px;
+  --radius-md: 2px;
+  --radius-lg: var(--radius);
+  --radius-xl: 8px;
+
+  --shadow-popover: var(--shadow-popover);
+  --ease-out-quint: cubic-bezier(0.2, 0, 0, 1);
+
+  --text-2xs: 11px;
+  --text-2xs--line-height: 1.4;
+  --text-table: 13px;
+  --text-table--line-height: 1.45;
+  --tracking-label: 0.08em;
+  --tracking-display: -0.02em;
+}
+
+@layer base {
+  * { @apply border-border outline-ring/50; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { @apply bg-background text-foreground font-sans text-sm antialiased; }
+  /* Instrument Serif ships 400 and italic only. Never fake-bold it. */
+  .display { @apply font-display font-normal leading-tight; letter-spacing: -0.01em; }
+  .display em { font-style: italic; }
+  .font-mono, .num, .num-dim, [data-numeric] { font-variant-numeric: tabular-nums; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+}
+
+@layer components {
+  /* --- Sections: hairline rules and numbered references (the Paper signature) */
+  .section-no { @apply font-mono text-xs text-muted-foreground tracking-label uppercase; }
+  .sheet { @apply rounded-lg border border-border bg-card; }
+  .sheet-head { @apply flex flex-wrap items-start justify-between gap-3 border-b border-border px-4 py-3; }
+  .sheet-title { @apply text-base font-semibold text-foreground; }
+  .sheet-note { @apply px-4 py-3 text-xs leading-relaxed text-muted-foreground; }
+  .prose-measure { max-width: 72ch; }
+
+  /* --- Ledger tables: right-aligned tabular figures, horizontal rules only */
+  .ledger { @apply w-full border-collapse text-left text-table; }
+  .ledger thead th { @apply whitespace-nowrap border-b border-border-strong bg-surface-2 px-3 py-2 font-mono text-2xs font-medium uppercase tracking-label text-muted-foreground; }
+  .ledger tbody td { @apply border-b border-border px-3 py-2 align-top text-foreground; }
+  .ledger tbody tr:last-child td { @apply border-b-0; }
+  .ledger tbody tr:hover td { @apply bg-surface-2; }
+  .num { @apply text-right font-mono whitespace-nowrap text-foreground; }
+  .num-dim { @apply text-right font-mono whitespace-nowrap text-muted-foreground; }
+
+  /* --- Navigation: active = brand tint + text shift */
+  .nav-item {
+    @apply inline-flex min-h-10 shrink-0 items-center gap-2 rounded-md px-3 text-sm whitespace-nowrap text-muted-foreground transition-colors duration-120;
+    @apply hover:bg-surface-2 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring;
+  }
+  .nav-item-active { @apply bg-brand-tint font-medium text-foreground hover:bg-brand-tint; }
+  .nav-index { @apply font-mono text-2xs text-muted-foreground; }
+
+  /* --- Controls: 2px radius, 36px tall, focus ring on every one */
+  .btn-primary, .btn-secondary, .btn-quiet {
+    @apply inline-flex h-9 shrink-0 items-center justify-center gap-2 rounded-md px-4 text-sm font-medium whitespace-nowrap transition-colors duration-120;
+    @apply focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-primary { @apply bg-primary text-primary-foreground hover:bg-primary/90 active:bg-primary/80; }
+  .btn-secondary { @apply border border-border-strong bg-card text-foreground hover:bg-surface-2 active:bg-muted; }
+  .btn-quiet { @apply px-2 text-muted-foreground hover:bg-surface-2 hover:text-foreground; }
+  .link { @apply rounded-sm text-primary underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring; }
+  .field {
+    @apply h-9 w-full min-w-0 rounded-md border border-input bg-card px-3 text-sm text-foreground placeholder:text-muted-foreground;
+    @apply focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-ring disabled:opacity-50;
+  }
+  .label { @apply mb-1 block text-xs font-medium text-muted-foreground; }
+  .segmented { @apply inline-flex flex-wrap gap-1 rounded-md border border-border bg-surface-2 p-1; }
+  .segment {
+    @apply inline-flex h-8 items-center rounded-sm px-3 text-xs font-medium text-muted-foreground transition-colors duration-120;
+    @apply hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ring;
+  }
+  .segment-active { @apply bg-card text-foreground; box-shadow: 0 0 0 1px var(--border-strong); }
+
+  /* --- Badges. Status colour marks the dot and border; the text stays in ink,
+         because success and warning fail AA as small text on a tint. */
+  .chip, .chip-neutral, .chip-safe, .chip-grey, .chip-distress, .chip-brand {
+    @apply inline-flex items-center gap-1.5 rounded-sm border px-1.5 py-0.5 font-mono text-2xs font-medium uppercase tracking-label whitespace-nowrap text-foreground;
+  }
+  .chip-neutral { @apply border-border-strong text-muted-foreground; }
+  .chip-safe { @apply border-success/50 bg-success/10; }
+  .chip-grey { @apply border-warning/50 bg-warning/10; }
+  .chip-distress { @apply border-destructive/50 bg-destructive/10; }
+  .chip-brand { @apply border-primary/30 bg-brand-tint text-primary; }
+  .chip-safe::before, .chip-grey::before, .chip-distress::before {
+    content: "";
+    @apply size-1.5 shrink-0 rounded-full;
+  }
+  .chip-safe::before { @apply bg-success; }
+  .chip-grey::before { @apply bg-warning; }
+  .chip-distress::before { @apply bg-destructive; }
+
+  /* --- Callouts for refusals, warnings and errors: tinted, ink text */
+  .callout-warning, .callout-danger, .callout-info {
+    @apply rounded-lg border px-4 py-3 text-sm leading-relaxed text-foreground;
+  }
+  .callout-warning { @apply border-warning/40 bg-warning/5; }
+  .callout-danger { @apply border-destructive/40 bg-destructive/5; }
+  .callout-info { @apply border-primary/25 bg-brand-tint; }
+
+  /* --- Auditor's tickmark: pass, fail, and a distinct not-evaluated */
+  .tickmark { @apply inline-flex size-5 shrink-0 items-center justify-center rounded-sm border; }
+
+  /* --- The one place boldness is spent: a rotated rubber stamp */
+  .stamp {
+    @apply inline-flex items-center justify-center rounded-sm border-3 px-6 py-3 text-center;
+    transform: rotate(-4deg);
+    box-shadow: inset 0 0 0 1px currentColor;
+  }
+  .stamp-label { @apply font-display text-3xl uppercase leading-none tracking-wide; }
+
+  /* --- Chart scaffolding */
+  .chart-tooltip {
+    @apply pointer-events-none absolute z-10 min-w-40 rounded-md border border-border bg-popover px-3 py-2 text-xs text-popover-foreground;
+    box-shadow: var(--shadow-popover);
+  }
+  .legend { @apply flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground; }
+  .legend-swatch { @apply inline-block size-2.5 shrink-0 rounded-sm; }
+
+  /* --- Skeleton: loading shapes that match final layout */
+  .skeleton { @apply animate-pulse rounded-md bg-surface-2; }
+}

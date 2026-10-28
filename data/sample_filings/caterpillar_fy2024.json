@@ -1,0 +1,57 @@
+{
+  "company": {
+    "name": "Caterpillar Inc.",
+    "industry": "industrial machinery",
+    "sector_class": "PUBLIC_MANUFACTURER",
+    "fiscal_year": 2024,
+    "currency": "USD",
+    "units": "MILLIONS",
+    "data_source": "Caterpillar Inc. FY2024 (FYE 2024-12-31), consolidated financial statements as standardised on stockanalysis.com (source: Fiscal.ai). Total assets cross-verified against SEC XBRL companyconcept CIK0000018230/us-gaap/Assets (10-K, fy2024) = 87,764,000,000 USD."
+  },
+  "expected": {
+    "altman_model": "Z_1968",
+    "zone": "SAFE",
+    "note": "Known-healthy public manufacturer. Validation control for the 1968 model."
+  },
+  "statements": [
+    {
+      "statement_type": "BALANCE_SHEET",
+      "source_note": "Caterpillar FY2024 consolidated balance sheet (FYE 2024-12-31), standardised.",
+      "line_items": {
+        "total_assets": 87764,
+        "current_assets": 45682,
+        "current_liabilities": 32272,
+        "total_liabilities": 68270,
+        "inventory": 16827,
+        "shareholder_equity": 19494,
+        "retained_earnings": 59352,
+        "total_debt": 38409,
+        "market_value_equity": 177528
+      }
+    },
+    {
+      "statement_type": "INCOME_STATEMENT",
+      "source_note": "Caterpillar FY2024 consolidated statement of results (FY ending 2024-12-31), standardised. Interest expense presented here as a positive magnitude; reported as -512.",
+      "line_items": {
+        "revenue": 64809,
+        "cogs": 40199,
+        "gross_profit": 24610,
+        "ebit": 13072,
+        "net_income": 10792,
+        "interest_expense": 512
+      }
+    },
+    {
+      "statement_type": "CASH_FLOW",
+      "source_note": "Caterpillar FY2024 cash flow statement, standardised. CapEx presented as a positive magnitude; reported as -3,215.",
+      "line_items": {
+        "operating_cash_flow": 12035,
+        "capital_expenditure": 3215
+      }
+    }
+  ],
+  "derivations": {
+    "market_value_equity": "Not a balance sheet line. Derived as published FY2024 PE ratio (16.45) x net income to common (10,792) = 177,528. Altman Z (1968) requires market value of equity at the FISCAL YEAR END, and a year-end market cap is not published as a standardised line item.",
+    "cogs": "Reported directly as cost of revenue (40,199); also equals revenue 64,809 - gross profit 24,610, which is a consistency check rather than the source."
+  }
+}

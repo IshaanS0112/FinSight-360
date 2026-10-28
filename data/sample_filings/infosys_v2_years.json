@@ -1,0 +1,103 @@
+{
+  "extends": "infosys_fy2024.json",
+  "note": "V2 companion file. Adds FY2023 (FYE 2023-03-31) and the FY2024 line items the V2 models need. Restates nothing already in infosys_fy2024.json - that file is a protected regression fixture and stays byte-identical.",
+  "company_ref": "Infosys Limited",
+  "data_source": "SEC XBRL company-facts API, CIK 0001067491, form 20-F, IFRS taxonomy. Pulled from https://data.sec.gov/api/xbrl/companyfacts/CIK0001067491.json - Infosys's own tagged extraction from its 20-F, reported in USD millions. A primary source, unlike the standardised statements the V1 file was transcribed from.",
+  "cross_check": "The same pull reproduces eight figures in infosys_fy2024.json exactly: Assets 16,523, CurrentAssets 10,722, CurrentLiabilities 4,651, Liabilities 5,918, Equity 10,605, LeaseLiabilities 1,002 (the V1 file's total_debt), FinanceCosts 56 (interest_expense), and ProfitLossAttributableToOwnersOfParent 3,167. Revenue reconciles as CostOfSales 12,975 + GrossProfit 5,587 = 18,562. Two figures differ and both are documented under basis_notes.",
+  "expected": {
+    "fiscal_years": [2023, 2024],
+    "note": "Known-healthy non-manufacturer with two clean years. Second multi-year case, and the one that shows what a documented basis difference does to a year-on-year model."
+  },
+  "basis_notes": {
+    "cost_of_sales": "The V1 file records FY2024 cogs as 13,096 and gross_profit as 5,466, transcribed from a standardised third-party statement. Infosys's own IFRS tagging reports CostOfSales 12,975 and GrossProfit 5,587 for the same year - a 121 reclassification, almost certainly of depreciation. This file uses the as-filed IFRS basis for FY2023 and does not restate FY2024. The consequence, stated rather than buried: the FY2023-to-FY2024 gross-margin comparison spans two bases and carries about 0.65 percentage points of noise, which flows into Piotroski test 8 and Beneish GMI. On these figures it changes GMI by roughly 2%, worth about 0.012 on an M-Score measured against a threshold of -1.78, so it does not move the verdict - but it is a real imperfection in a two-year comparison and the reader is entitled to know it is there. Caterpillar, whose every figure ties exactly across both years, is the clean multi-year case.",
+    "ebit": "The V1 file records FY2024 ebit as 3,835. Infosys tags ProfitLossFromOperatingActivities as 3,834 for the same year - a one-unit rounding difference in the standardised source. FY2023 uses the as-filed 3,825.",
+    "inventory": "The V1 file records FY2024 inventory as 43, from the standardised source. Infosys tags no Inventories concept at all, so FY2023 omits it. The quick ratio is therefore computable for FY2024 and omitted for FY2023, and Piotroski's liquidity test uses the current ratio, which is unaffected."
+  },
+  "statements": [
+    {
+      "fiscal_year": 2024,
+      "statement_type": "BALANCE_SHEET",
+      "source_note": "Infosys FY2024 20-F, additional tagged balance-sheet items required by the V2 models.",
+      "line_items": {
+        "accounts_receivable": 3620,
+        "accounts_payable": 474,
+        "ppe_net": 1537,
+        "long_term_debt": 767,
+        "cash_and_equivalents": 1773,
+        "shares_outstanding": 4139.950635
+      }
+    },
+    {
+      "fiscal_year": 2024,
+      "statement_type": "INCOME_STATEMENT",
+      "source_note": "Infosys FY2024 20-F. sga_expense is SalesAndMarketingExpense 842 + AdministrativeExpense 911; income_continuing_ops is ProfitLoss, including non-controlling interests.",
+      "line_items": {
+        "pretax_income": 4346,
+        "tax_expense": 1177,
+        "sga_expense": 1753,
+        "income_continuing_ops": 3169
+      }
+    },
+    {
+      "fiscal_year": 2024,
+      "statement_type": "CASH_FLOW",
+      "source_note": "Infosys FY2024 20-F. The V1 file carries no cash flow statement at all; both figures here are new, not restatements.",
+      "line_items": {
+        "operating_cash_flow": 3148,
+        "depreciation_amortization": 565
+      }
+    },
+    {
+      "fiscal_year": 2023,
+      "statement_type": "BALANCE_SHEET",
+      "source_note": "Infosys FY2023 consolidated balance sheet (FYE 2023-03-31), as tagged in the 20-F. Balances exactly: 15,312 = 6,088 + 9,224. shareholder_equity is Equity including non-controlling interests of 52, matching the V1 file's basis.",
+      "line_items": {
+        "total_assets": 15312,
+        "current_assets": 8626,
+        "current_liabilities": 4769,
+        "total_liabilities": 6088,
+        "shareholder_equity": 9224,
+        "retained_earnings": 11401,
+        "total_debt": 1010,
+        "accounts_receivable": 3094,
+        "accounts_payable": 470,
+        "ppe_net": 1679,
+        "long_term_debt": 859,
+        "cash_and_equivalents": 1481,
+        "shares_outstanding": 4136.387925
+      }
+    },
+    {
+      "fiscal_year": 2023,
+      "statement_type": "INCOME_STATEMENT",
+      "source_note": "Infosys FY2023 consolidated statement of profit and loss (FY ending 2023-03-31), as tagged. Interest expense is FinanceCosts, presented as a positive magnitude.",
+      "line_items": {
+        "revenue": 18212,
+        "cogs": 12709,
+        "gross_profit": 5503,
+        "ebit": 3825,
+        "net_income": 2981,
+        "pretax_income": 4125,
+        "tax_expense": 1142,
+        "interest_expense": 35,
+        "sga_expense": 1678,
+        "income_continuing_ops": 2983
+      }
+    },
+    {
+      "fiscal_year": 2023,
+      "statement_type": "CASH_FLOW",
+      "source_note": "Infosys FY2023 20-F cash flow statement. capital_expenditure is deliberately absent - see derivations.",
+      "line_items": {
+        "operating_cash_flow": 2853,
+        "depreciation_amortization": 524
+      }
+    }
+  ],
+  "derivations": {
+    "total_debt": "1,010 for FY2023 and 1,002 for FY2024 are LeaseLiabilities. Infosys tags no Borrowings concept - it carries no conventional debt - so its entire reported debt is the IFRS 16 lease liability. The V1 file uses the same figure for FY2024, which is why the same basis is used here.",
+    "sga_expense": "SalesAndMarketingExpense + AdministrativeExpense: 776 + 902 = 1,678 for FY2023 and 842 + 911 = 1,753 for FY2024. Infosys does not tag a combined SG&A line. Beneish SGAI needs one figure, and summing the two disclosed components is definitional rather than an estimate.",
+    "net_income": "ProfitLossAttributableToOwnersOfParent: 2,981 for FY2023, matching the V1 file's use of 3,167 for FY2024. income_continuing_ops carries ProfitLoss (2,983 and 3,169), which includes non-controlling interests and is the measure Beneish TATA wants.",
+    "capital_expenditure": "DELIBERATELY OMITTED for both years. Infosys does not tag PurchaseOfPropertyPlantAndEquipmentClassifiedAsInvestingActivities; its investing section is dominated by movements in treasury investments and is not decomposable into capital expenditure from the tagged facts alone. Rather than back it out of the PP&E roll-forward - which would silently fold acquisitions and disposals into a capex figure - the file omits it. The consequence is explicit: no DCF can be run for Infosys, because FCFF has no capex term, and the endpoint says exactly that rather than valuing the company with capital expenditure set to zero."
+  }
+}

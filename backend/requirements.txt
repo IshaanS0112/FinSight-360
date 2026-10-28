@@ -1,0 +1,15 @@
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+sqlalchemy==2.0.36
+psycopg2-binary==2.9.10
+pydantic==2.10.4
+pydantic-settings==2.7.0
+anthropic==1.16.0
+python-dotenv==1.0.1
+numpy==2.1.3
+scipy==1.14.1
+# Transitive, pinned deliberately. Starlette 0.41.3 imports
+# anyio.abc.BlockingPortal at module load; anyio >= 4.15 deprecates that
+# alias, and pytest.ini turns DeprecationWarning into an error. anthropic 1.x
+# needs httpx2, which needs anyio >= 4.10. 4.14.2 satisfies both.
+anyio==4.14.2

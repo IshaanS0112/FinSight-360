@@ -1,0 +1,15 @@
+line-length = 100
+target-version = "py310"
+
+[lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "C4"]
+ignore = [
+    "E501",   # line length is handled by the formatter
+    "B008",   # FastAPI's Depends() in defaults is the documented pattern
+]
+
+[lint.per-file-ignores]
+# Test fixtures import after setting environment variables, which has to happen
+# before app.config is imported anywhere.
+"tests/conftest.py" = ["E402"]
+"tests/*" = ["SIM117"]

@@ -1,0 +1,93 @@
+{
+  "extends": "vodafone_idea_fy2024.json",
+  "note": "V2 companion file. Adds FY2023 (FYE 2023-03-31) and the FY2024 line items the V2 models need. Restates nothing already in vodafone_idea_fy2024.json - that file is a protected regression fixture and stays byte-identical.",
+  "company_ref": "Vodafone Idea Limited",
+  "data_source": "Consolidated financial statements as standardised on stockanalysis.com (source: S&P Global Market Intelligence), reported in INR millions. The same source the V1 file was transcribed from. Vodafone Idea is not an SEC filer, so there is no XBRL primary source for it and no equivalent of the Caterpillar and Infosys cross-checks below.",
+  "cross_check": "Re-reading the source reproduces eight of the V1 file's FY2024 balance-sheet figures exactly: total assets 1,849,977, current assets 129,098, current liabilities 541,413, total liabilities 2,891,645, inventory 12, shareholders' equity -1,041,668, retained earnings -2,339,687, total debt 2,438,090. FY2023 balances exactly as well: 2,072,427 = 2,816,018 + (-743,591). Two income-statement figures now differ from V1 and both are documented under basis_notes.",
+  "expected": {
+    "fiscal_years": [2023, 2024],
+    "consensus_verdict": "HIGH_RISK",
+    "beneish_computable": false,
+    "note": "Known-distressed case, and now the suite's demonstration of partial results. Two consecutive loss years make Ohlson's INTWO fire and its CHIN term computable. The M-Score is still refused, because the source publishes no split of long-term debt - which is the model behaving correctly, not a gap in the data collection."
+  },
+  "basis_notes": {
+    "revenue": "The V1 file records FY2024 revenue as 426,517, derived in V1 from two published ratio cross-checks because the source did not then publish the line directly. The source now publishes 425,727 - a difference of 0.19%. FY2024 revenue is NOT restated, because that file is a regression fixture. The FY2024 cost of revenue below is derived on the published basis, so the FY2024 gross margin carries that 0.19% difference. FY2023 has no such issue: revenue and gross profit are both published for that year and the derived cost of revenue reproduces the published gross profit exactly.",
+    "ebit": "The source now publishes operating income of -62,278 for FY2023 and -56,304 for FY2024. Neither is included, and the omission is deliberate. The V1 file's missing EBIT is the project's worked example of a PARTIAL-but-decisive Altman score, covered by a protected test; supplying it for one year and not the other would also make every EBIT trend and DuPont comparison span an asymmetric basis. The figures are recorded here so the omission is a documented choice rather than a gap.",
+    "net_income": "The V1 file records FY2024 net income as -312,387, derived in V1 from published earnings yield x market cap. The source now publishes -312,384, a difference of 3 on 312,387. Not restated."
+  },
+  "statements": [
+    {
+      "fiscal_year": 2024,
+      "statement_type": "BALANCE_SHEET",
+      "source_note": "Vodafone Idea FY2024 consolidated balance sheet, additional standardised items required by the V2 models.",
+      "line_items": {
+        "accounts_receivable": 21948,
+        "accounts_payable": 134359,
+        "ppe_net": 528148
+      }
+    },
+    {
+      "fiscal_year": 2024,
+      "statement_type": "INCOME_STATEMENT",
+      "source_note": "Vodafone Idea FY2024 cost of revenue, derived from published revenue and gross profit - see derivations.",
+      "line_items": {
+        "cogs": 243181
+      }
+    },
+    {
+      "fiscal_year": 2024,
+      "statement_type": "CASH_FLOW",
+      "source_note": "Vodafone Idea FY2024 cash flow statement. The V1 file carries no cash flow statement; all three figures here are new. CapEx presented as a positive magnitude.",
+      "line_items": {
+        "operating_cash_flow": 208261,
+        "capital_expenditure": 16139,
+        "depreciation_amortization": 223893
+      }
+    },
+    {
+      "fiscal_year": 2023,
+      "statement_type": "BALANCE_SHEET",
+      "source_note": "Vodafone Idea FY2023 consolidated balance sheet (FYE 2023-03-31), standardised. Balances exactly: 2,072,427 = 2,816,018 + (-743,591). Shareholders' equity was already negative a year before the FY2024 figure the V1 file documents.",
+      "line_items": {
+        "total_assets": 2072427,
+        "current_assets": 139029,
+        "current_liabilities": 600227,
+        "total_liabilities": 2816018,
+        "inventory": 163,
+        "shareholder_equity": -743591,
+        "retained_earnings": -2031621,
+        "total_debt": 2377660,
+        "accounts_receivable": 21640,
+        "accounts_payable": 135364,
+        "ppe_net": 601214
+      }
+    },
+    {
+      "fiscal_year": 2023,
+      "statement_type": "INCOME_STATEMENT",
+      "source_note": "Vodafone Idea FY2023 revenue, cost of revenue and net loss. EBIT is deliberately absent - see basis_notes.",
+      "line_items": {
+        "revenue": 421426,
+        "cogs": 238237,
+        "gross_profit": 183189,
+        "net_income": -293011
+      }
+    },
+    {
+      "fiscal_year": 2023,
+      "statement_type": "CASH_FLOW",
+      "source_note": "Vodafone Idea FY2023 cash flow statement, standardised. CapEx presented as a positive magnitude; reported as -39,422.",
+      "line_items": {
+        "operating_cash_flow": 188687,
+        "capital_expenditure": 39422,
+        "depreciation_amortization": 226737
+      }
+    }
+  ],
+  "derivations": {
+    "cogs_2023": "238,237 = published revenue 421,426 - published gross profit 183,189. The source publishes gross profit but not cost of revenue; the identity is definitional.",
+    "cogs_2024": "243,181 = published revenue 425,727 - published gross profit 182,546, both on the source's current basis. Because the V1 file's FY2024 revenue of 426,517 is not restated, the gross margin the engine computes for FY2024 is 183,336 / 426,517 = 42.98% rather than the published 42.88%. The 0.10-point difference is the revenue basis difference described in basis_notes, and it is the only figure in this file that does not reconcile to a single published number.",
+    "long_term_debt": "DELIBERATELY OMITTED for both years. The source publishes total debt but no current/non-current split for this company. Long-term debt is a direct input to Piotroski test 5 and to Beneish LVGI, so both are reported as not evaluated and the M-Score is withheld entirely. That is the intended behaviour: an eight-variable model missing a variable is refused rather than approximated, and Vodafone Idea is the case that demonstrates it on real data.",
+    "shares_outstanding": "DELIBERATELY OMITTED. The source publishes a share count that moved substantially across the period on conversions and preferential issues, and a single point figure could not be reconciled to the equity movement. Piotroski's dilution test is therefore not evaluated. Given that shareholders' equity is -1,041,668m, a per-share valuation would not be meaningful in any case."
+  }
+}
